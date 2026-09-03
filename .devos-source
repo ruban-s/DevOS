@@ -1,0 +1,2 @@
+DevOS source checkout — install/hook tools refuse this directory as a target.
+See Tools/lib.ts isDevTreeCheckout.

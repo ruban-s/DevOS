@@ -1,0 +1,185 @@
+---
+name: Fabric
+version: 1.1.19
+description: "Run any of 240+ specialist prompt patterns in place across Extraction, Summarization, Analysis, Creation, Improvement, Security, Rating. Everyday picks: extract_wisdom, create_threat_model, analyze_claims, improve_writing, review_code, mermaid, youtube_summary. CLI reserved for YouTube transcripts (-y) and URL fallback (-u). Two workflows: ExecutePattern, UpdatePatterns. USE WHEN fabric, fabric pattern, run fabric, update patterns, threat model, analyze claims, improve writing, review code, mermaid, STRIDE, sigma rules. NOT FOR multi-agent investigation (Research) or content-adaptive extraction (ExtractWisdom)."
+---
+
+## Customization
+
+**Before executing, check for user customizations at:**
+`DEVOS/PROFILE/CUSTOMIZATIONS/SKILLS/Fabric/`
+
+If this directory exists, load and apply any PREFERENCES.md, configurations, or resources found there. These override default behavior. If the directory does not exist, proceed with skill defaults.
+
+## Voice Notification
+
+**When executing a workflow, do BOTH:**
+
+1. **Send voice notification**:
+   ```bash
+   curl -s -X POST http://localhost:31337/notify \
+     -H "Content-Type: application/json" \
+     -d '{"message": "Running the WORKFLOWNAME workflow in the Fabric skill to ACTION"}' \
+     > /dev/null 2>&1 &
+   ```
+
+2. **Output text notification**:
+   ```
+   Running the **WorkflowName** workflow in the **Fabric** skill to ACTION...
+   ```
+
+**Full documentation:** `DEVOS/RUNTIME/DOCS/Notifications/NotificationSystem.md`
+
+# Fabric
+
+## One Door, 240+ Patterns
+
+`Patterns/` holds 240-plus field-tested prompts, one directory per pattern, each with a single instruction file. To run a pattern, open its file and follow it as the prompt — right here, in the current session. No subprocess, no CLI round-trip, no added dependency on the common path. The external `fabric` binary waits on the shelf for the only two jobs it can do that native execution can't: YouTube transcripts (`-y`) and pages that shrug off a direct fetch (`-u`).
+
+The reasoning is drift. A threat model rebuilt from memory each month comes back vaguer than the last; summary formats wander; code reviews drop categories. A shared, versioned library pins each named pattern to one structure, and executing the file directly — instead of shelling out — keeps the loop tight and a moving part off the critical path.
+
+Coverage spans extraction, summarization, analysis, creation, improvement, security work, and rating. The everyday picks: `extract_wisdom`, `create_threat_model`, `analyze_claims`, `improve_writing`, `review_code`, `mermaid`, `youtube_summary`. The `Patterns/` directory is the real catalog; the category table below is an index over it, not the source of truth.
+
+## Workflow Routing
+
+| Workflow | Trigger | File |
+|----------|---------|------|
+| **ExecutePattern** | "use fabric", "run pattern", "apply pattern", "extract wisdom", "summarize", "analyze with fabric" | `Workflows/ExecutePattern.md` |
+| **UpdatePatterns** | "update fabric", "update patterns", "sync fabric", "pull patterns" | `Workflows/UpdatePatterns.md` |
+
+## Worked Examples
+
+**Example 1: Extract wisdom from content**
+```
+User: "Use fabric to extract wisdom from this article"
+-> Invokes ExecutePattern workflow
+-> Selects extract_wisdom pattern
+-> Reads Patterns/extract_wisdom/system.md
+-> Applies pattern to content
+-> Returns structured IDEAS, INSIGHTS, QUOTES, etc.
+```
+
+**Example 2: Update patterns**
+```
+User: "Update fabric patterns"
+-> Invokes UpdatePatterns workflow
+-> Runs git pull from upstream fabric repository
+-> Syncs patterns to local Patterns/ directory
+-> Reports pattern count
+```
+
+**Example 3: Create threat model**
+```
+User: "Use fabric to create a threat model for this API"
+-> Invokes ExecutePattern workflow
+-> Selects create_threat_model pattern
+-> Applies STRIDE methodology
+-> Returns structured threat analysis
+```
+
+## Quick Reference
+
+### Running a pattern without the CLI
+
+DevOS executes patterns in place rather than calling `fabric -p pattern_name`:
+1. Reads `Patterns/{pattern_name}/system.md`
+2. Applies the pattern instructions directly as the prompt
+3. Returns results with no external CLI calls
+
+### The two jobs still reserved for the `fabric` command
+
+- **`-y URL`** — YouTube transcript extraction
+- **`-u URL`** — URL content fetching (when native fetch fails)
+
+### Patterns reached for most often
+
+| Intent | Pattern | Description |
+|--------|---------|-------------|
+| Extract insights | `extract_wisdom` | IDEAS, INSIGHTS, QUOTES, HABITS |
+| Summarize | `summarize` | General summary |
+| 5-sentence summary | `create_5_sentence_summary` | Ultra-concise |
+| Threat model | `create_threat_model` | Security threat analysis |
+| Analyze claims | `analyze_claims` | Fact-check claims |
+| Improve writing | `improve_writing` | Writing enhancement |
+| Code review | `review_code` | Code analysis |
+| Main idea | `extract_main_idea` | Core message extraction |
+
+### Seeing everything available
+
+Browse the `Patterns/` directory for the complete set of 240+ patterns organized by category.
+
+## Execution Model
+
+```
+User Request → Pattern Selection → Read system.md → Apply → Return Results
+```
+
+Storage layout:
+
+```
+Patterns/
+├── extract_wisdom/
+│   └── system.md       # The prompt instructions
+├── summarize/
+│   └── system.md
+├── create_threat_model/
+│   └── system.md
+└── ...240+ patterns
+```
+
+A pattern's `system.md` is the entire prompt definition — IDENTITY (who the AI becomes), PURPOSE (what it accomplishes), STEPS (how input is processed), OUTPUT (the structured format it returns).
+
+## Pattern Categories
+
+| Category | Count | Examples |
+|----------|-------|----------|
+| **Extraction** | 30+ | extract_wisdom, extract_insights, extract_main_idea |
+| **Summarization** | 20+ | summarize, create_5_sentence_summary, youtube_summary |
+| **Analysis** | 35+ | analyze_claims, analyze_code, analyze_threat_report |
+| **Creation** | 50+ | create_threat_model, create_prd, create_mermaid_visualization |
+| **Improvement** | 10+ | improve_writing, improve_prompt, review_code |
+| **Security** | 15 | create_stride_threat_model, create_sigma_rules, analyze_malware |
+| **Rating** | 8 | rate_content, judge_output, rate_ai_response |
+
+## Integration
+
+### Feeds Into
+- **Research** - Fabric patterns enhance research analysis
+- **Blogging** - Content summarization and improvement
+- **Security** - Threat modeling and analysis
+
+### Uses
+- **fabric CLI** - For YouTube transcripts (`-y`) and URL fetching (`-u`)
+- **Native execution** - Direct pattern application (preferred)
+
+## File Organization
+
+| Path | Purpose |
+|------|---------|
+| `Patterns/` | Local pattern storage (240+) |
+| `Workflows/` | Execution workflows |
+
+## Changelog
+
+### 2026-01-18
+- Initial skill creation (extracted from DEVOS/Tools/fabric)
+- Native pattern execution (no CLI dependency for most patterns)
+- Two workflows: ExecutePattern, UpdatePatterns
+- 240+ patterns organized by category
+- Pack-ready structure
+
+## Gotchas
+
+- **`fabric -y URL` for YouTube extraction — don't scrape YouTube pages.** fabric handles transcript extraction natively.
+- **Pattern names are exact.** `extract_wisdom` not `extractwisdom`. Check `fabric --list` if unsure.
+- **Long content may exceed pattern context limits.** For very long inputs, chunk the content or use a summarize pattern first.
+
+## Execution Log
+
+After completing any workflow, append a single JSONL entry:
+
+```bash
+echo '{"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","skill":"Fabric","workflow":"WORKFLOW_USED","input":"8_WORD_SUMMARY","status":"ok|error","duration_s":SECONDS}' >> DEVOS/MEMORY/SKILLS/execution.jsonl
+```
+
+Replace `WORKFLOW_USED` with the workflow executed, `8_WORD_SUMMARY` with a brief input description, and `SECONDS` with approximate wall-clock time. Log `status: "error"` if the workflow failed.

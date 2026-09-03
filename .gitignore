@@ -1,0 +1,37 @@
+# Dependencies (skills carry their own package.json; never commit installs)
+node_modules/
+bun.lockb
+
+# Secrets — env-var names in repo, values never
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Harness runtime state (generated; system of record is the ISA + git)
+DEVOS/MEMORY/
+MEMORY/
+checkpoints.jsonl
+work.json
+doctor.json
+
+# Browser verification captures (may contain authenticated pages)
+interceptor-screenshot-*
+interceptor-capture-*
+interceptor-macos-screenshot-*
+
+# Local harness/machine config (per-machine, never shared)
+.claude/
+.opencode/
+
+
+# OS + editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+*.swo
+temp/
