@@ -23,7 +23,7 @@ For every platform you reach, walk the cascade in order. Move down only when the
 | Platform | Tier 1 (API) | Tier 2 (Scraper) | Tier 3 (Web search) |
 |----------|--------------|------------------|---------------------|
 | **Reddit** | JSON API (free, unauth, public — append `.json` to any URL) | Apify `trudax/reddit-scraper-lite` or `apify/reddit-scraper` | `site:reddit.com` via WebSearch |
-| **X / Twitter** | X API v2 recent-search (via `TWITTER_API_KEY` + `X_BEARER_TOKEN` env vars; LifeOS users with a private X-wrapper skill can invoke it here) | Apify `apidojo/tweet-scraper` | `site:x.com` via WebSearch |
+| **X / Twitter** | X API v2 recent-search (via `TWITTER_API_KEY` + `X_BEARER_TOKEN` env vars; invoke a private X-wrapper skill here if one exists) | Apify `apidojo/tweet-scraper` | `site:x.com` via WebSearch |
 | **YouTube** | YouTube Data API v3 (`commentThreads.list`, `search.list`) — requires `YOUTUBE_API_KEY` env var | `fabric -y URL` for transcripts; Apify `streamers/youtube-scraper` for comments | `site:youtube.com` |
 | **TikTok** | (no public API) | Apify `clockworks/tiktok-scraper` | `site:tiktok.com` |
 | **Bluesky** | AT Protocol public API (`api.bsky.app/xrpc/app.bsky.feed.searchPosts`) — no auth required for reads | Apify Bluesky scrapers | `site:bsky.app` |
@@ -65,7 +65,7 @@ If any signal fires → **sentiment-mode routing.** Otherwise → standard routi
 Spend agent slots across platforms in this order, walking the Tier-1 → Tier-3 cascade *inside each platform*:
 
 1. **Reddit (always first).** Where most English-language fandoms post raw reactions. Tier-1 path is the free JSON API.
-2. **X / Twitter.** Fastest reaction window (first 6 hours post-event). Tier-1 path is X API v2 recent-search via `curl` against `https://api.twitter.com/2/tweets/search/recent` with `Authorization: Bearer $X_BEARER_TOKEN`. LifeOS users who maintain a private X-wrapper skill can invoke that wrapper instead.
+2. **X / Twitter.** Fastest reaction window (first 6 hours post-event). Tier-1 path is X API v2 recent-search via `curl` against `https://api.twitter.com/2/tweets/search/recent` with `Authorization: Bearer $X_BEARER_TOKEN`. If you maintain a private X-wrapper skill, invoke that wrapper instead.
 3. **YouTube** — reactor channels and comment sections, especially for events / launches. Tier-1 path is YouTube Data API v3 *if `YOUTUBE_API_KEY` is set*; otherwise `fabric -y` for transcripts + Apify for comments.
 4. **TikTok** — viral-moment signal (which clips got reshared most). No public API → Apify is the primary path here.
 5. **Platform-native communities** — Discord, Steam reviews, subject-specific forums. Hit when relevant.
@@ -84,7 +84,7 @@ Reddit's JSON API is free, unauthenticated, public, and stable. It is the offici
 - Site-wide search: `https://www.reddit.com/search.json?q={query}&sort=top&t=month`
 - Thread + comments: `https://www.reddit.com/r/{sub}/comments/{id}.json`
 
-**Headers:** Set `User-Agent: LifeOS-Research/1.0` (Reddit rate-limits the default). Use `curl -A "LifeOS-Research/1.0" -s` or pass via WebFetch / Bash subagent.
+**Headers:** Set `User-Agent: DevOS-Research/1.0` (Reddit rate-limits the default). Use `curl -A "DevOS-Research/1.0" -s` or pass via WebFetch / Bash subagent.
 
 **Subreddit discovery:** if you don't know which sub has the conversation, run a site-wide search first and read the `subreddit` field on returned posts. Common subs cluster by domain — `r/{topic}`, `r/{topic}news`, `r/{topic}circlejerk` for contrarian signal.
 
@@ -132,7 +132,7 @@ curl -s "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&video
 
 ## X / Twitter
 
-**Tier 1 — X API v2 recent-search (default path).** Credentials live in env: `TWITTER_API_KEY`, `X_BEARER_TOKEN`, `TWITTER_CLIENT_ID/SECRET`. Call the recent-search endpoint directly via `curl` (or wrap it in a private skill — many LifeOS users keep a private `_X` skill that wraps this call; check your local skills before reinventing).
+**Tier 1 — X API v2 recent-search (default path).** Credentials live in env: `TWITTER_API_KEY`, `X_BEARER_TOKEN`, `TWITTER_CLIENT_ID/SECRET`. Call the recent-search endpoint directly via `curl` (or wrap it in a private skill — many teams keep a private `_X` skill that wraps this call; check your local skills before reinventing).
 
 ```bash
 curl -s -H "Authorization: Bearer $X_BEARER_TOKEN" \

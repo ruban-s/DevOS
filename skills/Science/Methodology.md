@@ -1,6 +1,6 @@
 # Science Methodology - The Deep Dive
 
-**This document elaborates on each phase of the scientific method as applied within LifeOS.**
+**This document elaborates on each phase of the scientific method as applied within DevOS.**
 
 The power of this methodology is its universality and its iteration speed. Apply it at micro-scale (TDD cycles) or macro-scale (product strategy). The pattern remains the same.
 
@@ -323,7 +323,7 @@ Ask:
 
 **When experiments are independent, run them in parallel.**
 
-This is where LifeOS shines:
+This is where DevOS shines:
 - Multiple worktrees for code experiments
 - Multiple agents for research experiments
 - Multiple eval runs for prompt experiments
@@ -556,7 +556,7 @@ This methodology applies to itself.
 
 ---
 
-## Integration with LifeOS Skills
+## Integration with DevOS Skills
 
 ### Development Skill
 Science manifests as TDD:

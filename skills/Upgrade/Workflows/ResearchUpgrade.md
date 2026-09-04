@@ -22,7 +22,7 @@ Deep dive on a specific upgrade opportunity to understand implementation details
 When the Upgrade workflow discovers something interesting, use this workflow to:
 1. Research the feature across authoritative sources
 2. Understand implementation details and best practices
-3. Map to the user's LifeOS architecture
+3. Map to the user's DevOS architecture
 4. Generate a detailed implementation plan
 
 ---
@@ -90,11 +90,11 @@ Compile findings into structured analysis:
 | **Limitations** | Known constraints or caveats |
 | **Best Practices** | Recommended usage patterns |
 
-### Step 4: Map to User's LifeOS
+### Step 4: Map to User's DevOS
 
 Using the user context from the Upgrade workflow (or gather fresh if not available):
 
-| LifeOS Component | Potential Impact |
+| DevOS Component | Potential Impact |
 |---------------|------------------|
 | Skills System | New capabilities, better patterns |
 | Hooks System | New triggers, better event handling |
@@ -125,10 +125,10 @@ Using the user context from the Upgrade workflow (or gather fresh if not availab
 ### Limitations
 [What it can't do or edge cases]
 
-## LifeOS Implementation
+## DevOS Implementation
 
 ### Opportunity
-[What this enables in your LifeOS setup]
+[What this enables in your DevOS setup]
 
 ### Implementation Steps
 - [ ] Step 1: [specific action]

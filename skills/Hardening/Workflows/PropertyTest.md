@@ -27,7 +27,7 @@ If none apply, skip property testing — use `bun-test` example form for the ISC
 
 ## The ten property categories
 
-| # | Category | Form | LifeOS-shaped example |
+| # | Category | Form | DevOS-shaped example |
 |---|----------|------|--------------------|
 | 1 | **Round-trip** | `decode(encode(x)) === x` | `parseFrontmatter(serializeFrontmatter(x)) ≡ x` |
 | 2 | **Idempotency** | `f(f(x)) === f(x)` | `removeTrailingNewline(removeTrailingNewline(s)) ≡ removeTrailingNewline(s)` |

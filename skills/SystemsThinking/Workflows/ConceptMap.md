@@ -102,10 +102,10 @@ KEY INSIGHTS:
 - [Insight from cross-link 2]
 ```
 
-## Worked Example — LifeOS Algorithm Subsystems
+## Worked Example — DevOS Algorithm Subsystems
 
 ```
-FOCUS QUESTION: What are the subsystems of the LifeOS Algorithm, and how do they interact?
+FOCUS QUESTION: What are the subsystems of the DevOS Algorithm, and how do they interact?
 
 CONCEPTS (general → specific):
 - Algorithm (root)

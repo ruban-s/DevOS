@@ -5,13 +5,13 @@
 ```bash
 curl -s -X POST http://localhost:31337/notify \
   -H "Content-Type: application/json" \
-  -d '{"message": "Running the Algorithm Upgrade workflow to analyze and propose improvements to the LifeOS Algorithm"}' \
+  -d '{"message": "Running the Algorithm Upgrade workflow to analyze and propose improvements to the DevOS Algorithm"}' \
   > /dev/null 2>&1 &
 ```
 
 Running the **AlgorithmUpgrade** workflow in the **Upgrade** skill to propose Algorithm improvements...
 
-**Dedicated self-improvement workflow for the LifeOS Algorithm.** Combines internal reflection mining with Algorithm spec analysis to produce concrete, section-targeted upgrade proposals.
+**Dedicated self-improvement workflow for the DevOS Algorithm.** Combines internal reflection mining with Algorithm spec analysis to produce concrete, section-targeted upgrade proposals.
 
 **Trigger:** "algorithm upgrade", "upgrade algorithm", "improve the algorithm", "algorithm improvements", "what should we fix in the algorithm"
 
@@ -211,7 +211,7 @@ Before proposing Algorithm changes, verify that the Algorithm's Claude Code refe
 ```
 Use Agent tool with subagent_type=claude-code-guide:
 
-"The LifeOS Algorithm has a Platform Capabilities table referencing Claude Code features.
+"The DevOS Algorithm has a Platform Capabilities table referencing Claude Code features.
 Read the current Algorithm spec at DEVOS/RUNTIME/ALGORITHM/v{VERSION}.md (get version from DEVOS/RUNTIME/ALGORITHM/LATEST).
 
 Verify that:

@@ -52,7 +52,7 @@ function loadConfig(): Config {
 ```
 
 **Key principles:**
-- Load from ${DEVOS_DIR}/.env (LifeOS standard)
+- Load from ${DEVOS_DIR}/.env (DevOS standard)
 - Clear error messages with resolution steps
 - Defaults for optional config
 - Type-safe Config interface
@@ -242,7 +242,7 @@ CONFIGURATION:
   Base URL: ${DEFAULTS.baseUrl}
 
 PHILOSOPHY:
-  ${CLI_NAME} follows LifeOS's CLI-First Architecture:
+  ${CLI_NAME} follows DevOS's CLI-First Architecture:
   - Deterministic: Same input → Same output
   - Clean: Single responsibility
   - Composable: Pipes to jq, grep, etc.

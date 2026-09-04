@@ -19,7 +19,7 @@ Running the **Upgrade** workflow in the **Upgrade** skill to check for upgrades.
 
 The user is reading a report (shaped exactly by `../References/OutputFormat.md`) in which:
 
-- **Every worthwhile new technique** from the monitored sources — Anthropic first, then creators, trending repos, and custom sources — is extracted with a quote or code block and mapped to the specific LifeOS file or component it would improve. What the best practitioners are actually doing, not links to where they said it.
+- **Every worthwhile new technique** from the monitored sources — Anthropic first, then creators, trending repos, and custom sources — is extracted with a quote or code block and mapped to the specific DevOS file or component it would improve. What the best practitioners are actually doing, not links to where they said it.
 - **Every recommendation is grounded**: it carries a Prior Status tag with file:line evidence gathered this run, so nothing already implemented, already deferred by decision, or already rejected is re-recommended. Already-done items appear in Skipped Content with evidence — the visible proof the prior-state check happened.
 - **Internal signal is present**: the reflection corpus has been mined (method: `MineReflections.md`), and where internal pain and external technique point at the same gap, the report says so — those are the strongest recommendations.
 - **Recommendations are tiered by judgment**, not formula: 🔴 CRITICAL (a gap or breakage-risk the system should not be running with), 🟠 HIGH (clear capability or efficiency win), 🟡 MEDIUM (worthwhile when convenient), 🟢 LOW (awareness). Only non-empty tiers print.

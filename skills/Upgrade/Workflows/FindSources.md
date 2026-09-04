@@ -19,7 +19,7 @@ Discover and evaluate new sources to add to upgrade monitoring.
 
 ## Overview
 
-This workflow helps identify new sources worth monitoring for LifeOS-relevant updates:
+This workflow helps identify new sources worth monitoring for DevOS-relevant updates:
 - YouTube channels creating relevant content
 - Blogs and newsletters covering AI development
 - GitHub repositories with useful patterns
@@ -54,7 +54,7 @@ Search: "MCP server tutorial YouTube"
 ```
 
 For each discovered channel, evaluate:
-- Content relevance to LifeOS infrastructure
+- Content relevance to DevOS infrastructure
 - Update frequency (active vs dormant)
 - Content quality and depth
 - Unique perspective or expertise
@@ -72,7 +72,7 @@ Search: "LLM engineering blog"
 ```
 
 Evaluate each source for:
-- Relevance to LifeOS goals
+- Relevance to DevOS goals
 - Technical depth
 - Update frequency
 - Signal-to-noise ratio
@@ -92,7 +92,7 @@ Search: site:github.com AI agent framework
 Look for:
 - Active maintenance
 - Good documentation
-- Patterns applicable to LifeOS
+- Patterns applicable to DevOS
 - TypeScript preferred (stack alignment)
 
 ---
@@ -103,7 +103,7 @@ For each potential source, score:
 
 | Criterion | Weight | Score (1-5) |
 |-----------|--------|-------------|
-| Relevance to LifeOS | 30% | |
+| Relevance to DevOS | 30% | |
 | Content Quality | 25% | |
 | Update Frequency | 20% | |
 | Unique Value | 15% | |
@@ -127,7 +127,7 @@ For each potential source, score:
 ### [Source Name]
 **Type:** YouTube / Blog / GitHub / Other
 **URL:** [url]
-**Relevance:** [Why this matters for LifeOS]
+**Relevance:** [Why this matters for DevOS]
 **Content Focus:** [What they cover]
 **Update Frequency:** [How often they post]
 
@@ -162,7 +162,7 @@ Edit `DEVOS/PROFILE/CUSTOMIZATIONS/SKILLS/Upgrade/youtube-channels.json`
 
 ### For Other Sources:
 Currently, non-YouTube sources are monitored via the base `sources.json`.
-To request additions to base Anthropic monitoring, note them for next LifeOS release.
+To request additions to base Anthropic monitoring, note them for next DevOS release.
 ```
 
 ---

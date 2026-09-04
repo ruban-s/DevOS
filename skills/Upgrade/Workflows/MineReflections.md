@@ -103,7 +103,7 @@ UPGRADE CANDIDATE: [Theme Name]
     - [timestamp] [task_description] — "[relevant reflection quote]"
   Root cause: [What structural issue causes this pattern]
   Proposed fix: [Specific change to Algorithm, skill, hook, or system]
-  Target file(s): [Which LifeOS files would change]
+  Target file(s): [Which DevOS files would change]
   Effort estimate: [Instant/Fast/Standard/Extended]
 ```
 

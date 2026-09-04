@@ -52,7 +52,7 @@ Native sync does not exempt you from the skill's verification standard. For any 
 
 ## Gotchas
 
-- **These are Claude Code CLI commands, not LifeOS skills or REST APIs.** There is still no public Claude Design REST API or MCP server — the CLI commands are the programmatic surface.
+- **These are Claude Code CLI commands, not DevOS skills or REST APIs.** There is still no public Claude Design REST API or MCP server — the CLI commands are the programmatic surface.
 - **Subscription-gated.** Free tier has no Claude Design access; the commands won't function.
 - **`/update` if missing.** The single most common "the command doesn't exist" cause is a stale Claude Code build.
 - **Sync direction is explicit.** `/design-sync` is bidirectional — be deliberate about pull (code → Claude Design) vs push (Claude Design → code) so you don't overwrite the side you meant to keep.

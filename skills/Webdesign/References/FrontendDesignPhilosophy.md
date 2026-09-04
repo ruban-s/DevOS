@@ -4,7 +4,7 @@
 > Source: https://github.com/anthropics/skills/tree/main/skills/frontend-design
 > Authors: Prithvi Rajasekaran, Alexander Bricken (Anthropic).
 > License: MIT (see Webdesign/References/FrontendDesignPhilosophy.LICENSE.txt for full terms).
-> Imported: 2026-05-08. Webdesign-specific extensions appear under "LifeOS Extensions" sections, clearly marked.
+> Imported: 2026-05-08. Webdesign-specific extensions appear under "DevOS Extensions" sections, clearly marked.
 
 This file is the load-bearing reference for the **DirectDesign** workflow. The DirectDesign workflow is short — it routes to this file for the actual aesthetic content.
 
@@ -192,9 +192,9 @@ A page is done when:
 
 ---
 
-## LifeOS Extensions
+## DevOS Extensions
 
-These extensions are LifeOS-specific (not in the upstream Anthropic source). They handle integration into the wider LifeOS workflow.
+These extensions are DevOS-specific (not in the upstream Anthropic source). They handle integration into the wider DevOS workflow.
 
 ### Output Contract — declared up front
 
@@ -214,7 +214,7 @@ Web output gets verified via the **Interceptor skill** before declaring done. Th
 
 ### Customization layer
 
-LifeOS users may set personal aesthetic defaults at `DEVOS/PROFILE/CUSTOMIZATIONS/SKILLS/Webdesign/PREFERENCES.md`. If that file exists and DirectDesign is invoked, Step 1's aesthetic-tone choice is biased toward (not bound to) the user's stated preference. Without preferences, choose freshly each time and rotate registers across sessions.
+DevOS users may set personal aesthetic defaults at `DEVOS/PROFILE/CUSTOMIZATIONS/SKILLS/Webdesign/PREFERENCES.md`. If that file exists and DirectDesign is invoked, Step 1's aesthetic-tone choice is biased toward (not bound to) the user's stated preference. Without preferences, choose freshly each time and rotate registers across sessions.
 
 ### When to choose DirectDesign vs ClaudeDesign
 

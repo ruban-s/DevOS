@@ -53,30 +53,30 @@ If `--focus` is not specified, auto-detect from content:
 - **Wisdom**: philosophy, principle, life, wisdom, insight, experience
 - **General**: everything else
 
-### Step 3: Extract Knowledge Using LifeOS Services
+### Step 3: Extract Knowledge Using MCP Services
 
 **For Security Content:**
-- Use `mcp__pai__extract_primary_problem` and `mcp__pai__extract_primary_solution`
+- Use `mcp__devos__extract_primary_problem` and `mcp__devos__extract_primary_solution`
 - Extract attack vectors, vulnerabilities, defensive measures
 - Generate technical security recommendations
 
 **For Business Content:**
-- Use `mcp__pai__extract_primary_problem` and `mcp__pai__extract_primary_solution`
+- Use `mcp__devos__extract_primary_problem` and `mcp__devos__extract_primary_solution`
 - Extract revenue opportunities, market insights, growth strategies
 - Generate business action items
 
 **For Research Content:**
-- Use `mcp__pai__analyze_paper` if academic content
+- Use `mcp__devos__analyze_paper` if academic content
 - Extract key findings, methodology insights, technical details
 - Rate research quality and reproducibility
 
 **For Wisdom Content:**
-- Use `mcp__pai__author_wisdom_aphorism` and `mcp__pai__create_quotes`
+- Use `mcp__devos__author_wisdom_aphorism` and `mcp__devos__create_quotes`
 - Extract life principles, philosophical insights, practical wisdom
 - Generate memorable quotes and aphorisms
 
 **For General Content:**
-- Use `mcp__pai__create_expanded_summary` and `mcp__pai__rate`
+- Use `mcp__devos__create_expanded_summary` and `mcp__devos__rate`
 - Extract key concepts, important facts, learning opportunities
 
 ### Step 4: Structure Output

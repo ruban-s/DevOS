@@ -15,7 +15,7 @@ Decision matrix for choosing the right export from Claude Design.
 | **Folder** | Local file archive | Directory of assets | Manual processing |
 | **Platform handoff** | Push straight to another tool | Direct export to Vercel, Replit, Lovable, Wix, Base44, Gamma, Miro, Adobe | That platform's UI |
 
-The June 2026 update expanded the export picker with direct destinations: **Adobe, Base44, Canva, Gamma, Lovable, Miro, Replit, Vercel, Wix** alongside PDF and PPTX. For LifeOS code work the **Bundle** export is still the right call — those platform destinations are for handing off to a non-LifeOS tool, not for landing code in your own repo.
+The June 2026 update expanded the export picker with direct destinations: **Adobe, Base44, Canva, Gamma, Lovable, Miro, Replit, Vercel, Wix** alongside PDF and PPTX. For DevOS code work the **Bundle** export is still the right call — those platform destinations are for handing off to a non-DevOS tool, not for landing code in your own repo.
 
 ## Decision Tree
 

@@ -9,7 +9,7 @@ User: "check for upgrades"
 
 [Agents run in parallel...]
 
-# LifeOS Upgrade Report
+# DevOS Upgrade Report
 **Generated:** 2026-01-15 19:45:00 PST
 **Sources Processed:** 20 release notes parsed | 5 videos checked | 30 docs analyzed
 **Findings:** 3 techniques extracted | 4 content items skipped
@@ -20,7 +20,7 @@ User: "check for upgrades"
 
 Everything interesting we found, ranked by how cool it is.
 
-| # | Discovery | Source | Why It's Interesting | LifeOS Relevance |
+| # | Discovery | Source | Why It's Interesting | DevOS Relevance |
 |---|-----------|--------|---------------------|---------------|
 | 1 | PreToolUse hooks can inject reasoning context | claude-code v2.1.16 | Hooks can now return `additionalContext` that Claude reasons about before tool execution — this is a paradigm shift from binary block/allow to intelligent security | SecurityValidator could inject warnings instead of blocking, enabling context-aware security decisions |
 | 2 | Native ${CLAUDE_SESSION_ID} variable | claude-code v2.1.16 | Session IDs are now first-class environment variables everywhere — no more extraction hacks | Session documentation workflows can drop manual ID extraction code |
@@ -32,13 +32,13 @@ Everything interesting we found, ranked by how cool it is.
 
 ### 🔴 CRITICAL — Integrate immediately
 
-| # | Recommendation | Prior Status | Evidence | LifeOS Relevance | Effort | Files Affected |
+| # | Recommendation | Prior Status | Evidence | DevOS Relevance | Effort | Files Affected |
 |---|---------------|-------------|----------|---------------|--------|----------------|
 | 1 | Add PreToolUse additionalContext to security hooks | 🆕 NEW | `hooks/SecurityPipeline.hook.ts:42` (illustrative example — not a real file) returns binary deny/allow only | SecurityValidator currently hard-blocks commands — additionalContext enables reasoning-based security that adapts to context | Low | `hooks/SecurityValidator.hook.ts` |
 
 ### 🟠 HIGH — Integrate this week
 
-| # | Recommendation | Prior Status | Evidence | LifeOS Relevance | Effort | Files Affected |
+| # | Recommendation | Prior Status | Evidence | DevOS Relevance | Effort | Files Affected |
 |---|---------------|-------------|----------|---------------|--------|----------------|
 | 2 | Replace session ID hacks with native ${CLAUDE_SESSION_ID} | 🔶 PARTIAL | `skills/_MYSKILL/Workflows/DocumentSession.md:15` uses extraction hack | Session documentation workflows have manual extraction workarounds — native variable eliminates fragile code | Low | `skills/_MYSKILL/Workflows/DocumentSession.md` |
 
@@ -56,7 +56,7 @@ Everything interesting we found, ranked by how cool it is.
 
 **What It Is:** PreToolUse hooks can now return an additionalContext field that gets injected into the model's context before tool execution, enabling reasoning-based security rather than hard blocks.
 
-**How It Helps LifeOS:** SecurityValidator.hook.ts currently blocks dangerous commands. With additionalContext, it can inject warnings Claude reasons about, enabling smarter security that adapts to context.
+**How It Helps DevOS:** SecurityValidator.hook.ts currently blocks dangerous commands. With additionalContext, it can inject warnings Claude reasons about, enabling smarter security that adapts to context.
 
 **The Technique:**
 ```typescript
@@ -73,7 +73,7 @@ return { decision: "allow", additionalContext: "WARNING: Protected file." };
 
 **What It Is:** Native environment variable ${CLAUDE_SESSION_ID} is now available in all hooks and commands, eliminating the need for custom session ID extraction or workaround code.
 
-**How It Helps LifeOS:** Our session documentation workflows had manual session ID extraction hacks. Native substitution means cleaner code and reliable session tracking across all LifeOS workflows.
+**How It Helps DevOS:** Our session documentation workflows had manual session ID extraction hacks. Native substitution means cleaner code and reliable session tracking across all DevOS workflows.
 
 **The Technique:**
 ```bash
@@ -86,7 +86,7 @@ echo "Session: ${CLAUDE_SESSION_ID}"
 
 ## 📊 Summary
 
-| # | Technique | Source | Priority | LifeOS Component | Effort |
+| # | Technique | Source | Priority | DevOS Component | Effort |
 |---|-----------|--------|----------|---------------|--------|
 | 1 | PreToolUse Additional Context | claude-code v2.1.16 | 🔴 | SecurityValidator hook | Low |
 | 2 | Session ID Substitution | claude-code v2.1.16 | 🟠 | DocumentSession workflow | Low |
@@ -100,7 +100,7 @@ echo "Session: ${CLAUDE_SESSION_ID}"
 | MCP auto mode | claude-code v2.1.16 | ✅ DONE — already enabled by default | `settings.json:18` |
 | Gemini 3 videos | YouTube | Not relevant to Claude-centric stack | — |
 | Agent Experts video | YouTube | No concrete technique identified | — |
-| SDK update v0.78 | GitHub | LifeOS uses CLI, not raw SDK | `CLAUDE.md:12` |
+| SDK update v0.78 | GitHub | DevOS uses CLI, not raw SDK | `CLAUDE.md:12` |
 
 ## 🔍 Sources Processed
 30 Anthropic sources, 5 YouTube videos, 0 custom → 2 relevant findings

@@ -1,6 +1,6 @@
 # Webdesign
 
-LifeOS orchestration skill for **Claude Design** (claude.ai/design) — Anthropic's visual design product launched April 17, 2026.
+DevOS orchestration skill for **Claude Design** (claude.ai/design) — Anthropic's visual design product launched April 17, 2026.
 
 ## What It Does
 

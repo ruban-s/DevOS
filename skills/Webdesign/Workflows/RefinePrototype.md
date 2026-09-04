@@ -88,7 +88,7 @@ Effective refinement prompts are specific and bounded:
 
 - **Vague refinements** — "make it better" produces drift, not improvement. Be specific.
 - **Too many simultaneous changes** — multiple requests in one prompt compound errors. One change at a time for precision.
-- **Switching aesthetic mid-iteration** — see feedback `stay_in_named_workflow.md` in the canonical LifeOS memory: if you chose brutalist, "make it better" means better-within-brutalist, not switch to minimalist. Be explicit if switching aesthetic.
+- **Switching aesthetic mid-iteration** — see feedback `stay_in_named_workflow.md` in the canonical DevOS memory: if you chose brutalist, "make it better" means better-within-brutalist, not switch to minimalist. Be explicit if switching aesthetic.
 - **Refining past the point of return** — if 5+ refinement rounds haven't converged, the original brief was wrong. Restart from `CreatePrototype` with a sharper brief.
 
 ## Time Estimate

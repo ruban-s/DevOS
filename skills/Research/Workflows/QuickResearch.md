@@ -17,7 +17,7 @@
 
 Scan the user's request for sentiment signals: "fans thought", "ratings of", "best | worst | favorite", "reactions to", "what people are saying", "consensus on", event + recent date.
 
-- **Signal fires → sentiment-mode.** Skip Step 1 (Perplexity). Instead, single-call to Reddit JSON API at the most relevant subreddit + sort: `curl -A "LifeOS-Research/1.0" -s "https://www.reddit.com/r/{sub}/top.json?t=week&limit=25"` (or site-wide search if sub is unknown). Parse top 10 posts, pull comments on the highest-signal thread, return verbatim fan quotes with thread URLs and scores. Use Apify Reddit actor as fallback only if JSON fails.
+- **Signal fires → sentiment-mode.** Skip Step 1 (Perplexity). Instead, single-call to Reddit JSON API at the most relevant subreddit + sort: `curl -A "DevOS-Research/1.0" -s "https://www.reddit.com/r/{sub}/top.json?t=week&limit=25"` (or site-wide search if sub is unknown). Parse top 10 posts, pull comments on the highest-signal thread, return verbatim fan quotes with thread URLs and scores. Use Apify Reddit actor as fallback only if JSON fails.
 - **No signal → Step 1 (Perplexity).** Standard quick lookup.
 
 ### Step 1: Launch Single Perplexity Agent

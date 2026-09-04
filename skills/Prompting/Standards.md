@@ -87,7 +87,7 @@ When authoring or optimizing any prompt, hunt for restatements a leading word re
 - **Opus 4.5–4.8 may overtrigger tools:** Dial back aggressive language
 - **Change:** "CRITICAL: You MUST use this tool" → "Use this tool when..."
 - **Softer framing:** Reduces excessive tool invocation
-- **Opus 4.8 favors reasoning over tool calls:** if you want *more* tool use, run at `high` effort (the LifeOS ceiling) or describe when/how to use the tool — don't shout
+- **Opus 4.8 favors reasoning over tool calls:** if you want *more* tool use, run at `high` effort (DevOS ceiling: `max`) or describe when/how to use the tool — don't shout
 
 ## Literal Instruction Following (Opus 4.8)
 
@@ -367,7 +367,7 @@ Report every issue you find, including ones you are uncertain about or consider 
 
 If you must self-filter in a single pass, be concrete about the bar ("report any bug that could cause incorrect behavior, a test failure, or a misleading result; omit only pure style/naming nits") — never a qualitative term like "important."
 
-This is the find→verify split the Workflow tool already encodes: finders maximize coverage, an adversarial verify stage kills the false positives. Any LifeOS review/finding prompt (Cato, a security-assessment skill's finding phases, code-review fan-outs) inherits this rule.
+This is the find→verify split the Workflow tool already encodes: finders maximize coverage, an adversarial verify stage kills the false positives. Any DevOS review/finding prompt (a security-assessment skill's finding phases, code-review fan-outs) inherits this rule.
 
 ---
 
@@ -769,11 +769,11 @@ An **open-source framework** for augmenting humans using AI.
 
 **Location:** github.com/danielmiessler/Fabric
 
-## Native Fabric Patterns in LifeOS
+## Native Fabric Patterns in DevOS
 
 **Location:** `DEVOS/skills/Fabric/Patterns/`
 
-LifeOS maintains a local copy of all Fabric patterns for native execution. Instead of spawning the `fabric` CLI for every pattern-based task, the system reads and applies patterns directly as prompts.
+DevOS maintains a local copy of all Fabric patterns for native execution. Instead of spawning the `fabric` CLI for every pattern-based task, the system reads and applies patterns directly as prompts.
 
 ### When to Use Native Patterns (Default)
 
@@ -803,7 +803,7 @@ Run the update script to sync latest patterns:
 DEVOS/skills/Fabric/Tools/update-patterns.sh
 ```
 
-This pulls upstream updates via `fabric -U` and syncs to LifeOS's local copy.
+This pulls upstream updates via `fabric -U` and syncs to DevOS's local copy.
 
 ---
 
@@ -1066,15 +1066,15 @@ Verify across multiple sources. Develop competing hypotheses. Track confidence l
 
 # Prompt Templating System
 
-**Foundation:** Based on Anthropic's official `{{variable}}` syntax, industry patterns (LangChain, Handlebars, DSPy), and LifeOS's unique skill architecture.
+**Foundation:** Based on Anthropic's official `{{variable}}` syntax, industry patterns (LangChain, Handlebars, DSPy), and DevOS's unique skill architecture.
 
-**Philosophy:** Templates enable prompts to write prompts—dynamic composition where structure is fixed but content is parameterized. This is core LifeOS DNA.
+**Philosophy:** Templates enable prompts to write prompts—dynamic composition where structure is fixed but content is parameterized. This is core DevOS DNA.
 
 ---
 
 ## Core Syntax
 
-LifeOS uses Handlebars notation for template variables:
+DevOS uses Handlebars notation for template variables:
 
 | Syntax | Purpose | Example |
 |--------|---------|---------|
@@ -1305,7 +1305,7 @@ const output = renderTemplate('Primitives/Briefing.hbs', {
 
 ---
 
-## Integration with LifeOS Systems
+## Integration with DevOS Systems
 
 | System | Template Use |
 |--------|--------------|

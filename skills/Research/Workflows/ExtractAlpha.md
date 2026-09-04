@@ -269,7 +269,7 @@ ls -lah ~/.claude/History/research/$(date +%Y-%m-%d)_podcast-analysis/
 #### Why This Pattern Matters
 
 1. **Work item integration:** Working artifacts are tied to the work item for learning
-2. **System intelligence:** LifeOS can analyze how research progresses over time
+2. **System intelligence:** DevOS can analyze how research progresses over time
 3. **Context preservation:** Working files provide context for final outputs
 4. **Proper documentation:** README ensures context is preserved in history
 5. **Hook verification:** Ensures nothing is lost if hooks fail
@@ -349,7 +349,7 @@ Simple markdown list with blank lines between items for readability:
 # Step 1: Extract transcript
 fabric -y "https://youtu.be/VIDEO_ID"
 
-# Step 2 & 3: Apply this skill (LifeOS does this automatically)
+# Step 2 & 3: Apply this skill (the agent does this automatically)
 # - Deep deep thinking analysis
 # - Extract insights
 # - Output 24-30 highest-alpha insights
@@ -359,16 +359,16 @@ fabric -y "https://youtu.be/VIDEO_ID"
 
 ```typescript
 // User provides article URL or text
-// LifeOS:
+// DevOS:
 // 1. Fetches content (WebFetch or direct paste)
 // 2. Applies deep thinking protocol
 // 3. Extracts insights
 // 4. Returns high-alpha list
 ```
 
-## Integration with LifeOS
+## Integration with DevOS
 
-When this skill activates, LifeOS should:
+When this skill activates, the agent should:
 
 1. **Load content** via appropriate method (fabric -y, WebFetch, Read, or paste)
 2. **Get current work directory** - Read `~/.claude/` for `work_dir`

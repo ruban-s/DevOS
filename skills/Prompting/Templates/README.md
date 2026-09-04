@@ -1,11 +1,11 @@
-# LifeOS Templating System
+# DevOS Templating System
 
 **Version:** 1.0.0
 **Rollback Point:** v2.5.0
 
 ## Overview
 
-The LifeOS templating system enables **prompts that write prompts**—dynamic composition where structure is fixed but content is parameterized. Based on Anthropic's official `{{variable}}` syntax and industry best practices.
+The DevOS templating system enables **prompts that write prompts**—dynamic composition where structure is fixed but content is parameterized. Based on Anthropic's official `{{variable}}` syntax and industry best practices.
 
 ## Directory Structure
 
@@ -36,7 +36,7 @@ Templates/
 
 ## Core Syntax
 
-LifeOS uses Handlebars notation for template variables:
+DevOS uses Handlebars notation for template variables:
 
 | Syntax | Purpose | Example |
 |--------|---------|---------|
@@ -168,7 +168,7 @@ cd ~/.claude
 git checkout v2.5.0
 # Or to just undo templating:
 rm -rf Templates/
-git checkout v2.5.0 -- LIFEOS/Prompting.md
+git checkout v2.5.0 -- DEVOS/skills/Prompting/
 ```
 
 ## Token Savings
