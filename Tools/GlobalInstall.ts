@@ -1,8 +1,8 @@
 #!/usr/bin/env bun
 /**
  * GlobalInstall — Phase 7. Installs DevOS into a harness config root
- * (default: ~/.claude) as a SIBLING of any existing LifeOS install:
- * `<configRoot>/DEVOS/`. Never touches LIFEOS/, skills/, or settings.json
+ * (default: ~/.claude) as a SIBLING of any existing predecessor install:
+ * `<configRoot>/DEVOS/`. Never touches a predecessor `LIFEOS/` dir, skills/,
  * content — except the two explicitly permissioned, separately-gated writes:
  *   --wire-claude-md : refresh the DevOS pointer block in <configRoot>/CLAUDE.md
  *   --wire-hooks     : merge DEVOS hook entries into <configRoot>/settings.json
@@ -39,7 +39,7 @@ function claudeBlock(): string {
   return `${CLAUDE_START}
 ## DevOS harness (global install)
 
-DevOS 0.1 lives at \`DEVOS/\` (sibling of LIFEOS — neither touches the other). Harness contract: \`DEVOS/SKILL.md\`; constitution: \`DEVOS/RUNTIME/SYSTEM_PROMPT.md\`; spec format: \`DEVOS/RUNTIME/ISA_FORMAT.md\`. Route DevOS work (setup/spec/doctor/update) through \`DEVOS/SKILL.md\`; repo-local installs additionally carry their own \`DEVOS/\` plus an \`ISA.md\` spec.
+DevOS lives at \`DEVOS/\` (sibling of any predecessor \`LIFEOS/\` install — neither touches the other). Harness contract: \`DEVOS/SKILL.md\`; constitution: \`DEVOS/RUNTIME/SYSTEM_PROMPT.md\`; spec format: \`DEVOS/RUNTIME/ISA_FORMAT.md\`. Route DevOS work (setup/spec/doctor/update) through \`DEVOS/SKILL.md\`; repo-local installs additionally carry their own \`DEVOS/\` plus an \`ISA.md\` spec.
 ${CLAUDE_END}`;
 }
 
@@ -91,8 +91,8 @@ function main(): void {
   let version = "0.0.0";
   try { version = readHarnessVersion(); } catch (e) { emit({ ok: false, error: String(e) }, 1); }
 
-  // Sibling-safety preflight (both modes): LIFEOS must survive untouched.
-  const lifeosPresent = existsSync(join(configRoot, "LIFEOS"));
+  // Sibling-safety preflight (both modes): a predecessor LIFEOS install must survive untouched.
+  const predecessorPresent = existsSync(join(configRoot, "LIFEOS"));
   const settingsPath = join(configRoot, "settings.json");
   const claudeMdPath = join(configRoot, "CLAUDE.md");
   const settingsExists = existsSync(settingsPath);
@@ -138,7 +138,7 @@ function main(): void {
     emit({
       ok: true, dryRun: true, configRoot, harness, version,
       availableAis,
-      siblingSafety: { lifeosPresent, lifeosTouched: false },
+      siblingSafety: { predecessorPresent, predecessorTouched: false },
       wouldDeploy: deploy.slice(0, 30), wouldDeployTotal: deploy.length,
       memoryDirs: MEMORY_DIRS.map((d) => `DEVOS/MEMORY/${d}`),
       claudeMd: { present: claudeMdPresent, hasBlock: claudeMdHasBlock, wouldWrite: wireClaudeMd && (!claudeMdPresent || !claudeMdHasBlock) },
@@ -236,7 +236,7 @@ function main(): void {
   emit({
     ok: true, configRoot, harness, version,
     availableAis,
-    siblingSafety: { lifeosPresent, lifeosTouched: false },
+    siblingSafety: { predecessorPresent, predecessorTouched: false },
     added, skippedExisting: skipped.length, substituted,
     survivingPlaceholders: placeholders, writes,
   }, 0);

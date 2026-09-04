@@ -1,6 +1,6 @@
 # Skills port — DevOS v0.2
 
-Curated from `temp/reference/LifeOS/install/skills/` (upstream). Kept skills arrived via mechanical path rewrites (v0.1), then all 37 SKILL.md files were rewritten in original DevOS prose (v0.2 — same capabilities and triggers, restructured sections, own voice; conventions blocks like voice-notify/customization kept as DevOS standards). Upstream `version:` lines were kept through the port and bumped +1 patch on rewrite. Deep reference/workflow docs (Workflows/, References/, Examples/, ~500 files) still carry ported prose except where noted — a follow-up rewrite program. Until that completes, the LICENSE attribution to LifeOS stays.
+Curated from `temp/reference/LifeOS/install/skills/` (upstream). Kept skills arrived via mechanical path rewrites (v0.1), then all 37 SKILL.md files were rewritten in original DevOS prose (v0.2 — same capabilities and triggers, restructured sections, own voice; conventions blocks like voice-notify/customization kept as DevOS standards). The v0.2.x debrand program then rewrote all deep reference/workflow docs and skill tools in DevOS prose (branding, user-agent strings, example agent names, and DevOS-inaccurate specifics reframed; behavior unchanged). Upstream `version:` lines were kept through the port and bumped +1 patch on rewrite. Remaining `LifeOS`/`LIFEOS` strings are functional or provenance, not branding: the `ContextSearch.ts` legacy-namespace migration read path, `GlobalInstall.ts`/`lib.ts` sibling-safety interop with on-disk LIFEOS installs, provenance headers in `RUNTIME/ALGORITHM/` and lineage notes in `RUNTIME/*`, and Fabric upstream URLs (third-party project). LICENSE attribution to LifeOS is KEPT (decision locked — MIT "substantial portions" condition applies to this tree; see review 2026-09-04).
 
 ## Kept (37)
 
@@ -44,5 +44,5 @@ bare `LIFEOS/TOOLS|RULES|ALGORITHM|MEMORY|DOCUMENTATION|USER/` → same DEVOS ta
 - CreateSkill doc examples use placeholder skill names (`SkillName`, `MyBlog`, `MyDaemon`, `OSINT`) and dropped-skill paths (`Art/`) — illustrations, not imports.
 - `DEVOS/RUNTIME/DOCS/` doesn't exist — doc pointers there dangle until subsystem docs port.
 - CreateSkill/Upgrade still speak "OS version"/"OS roll-up" prose — true of DevOS, left as-is.
-- Historical examples left intact (`git checkout v2.5.0 -- LIFEOS/Prompting.md`, `@pai/*` package name).
+- Skill `package.json` scopes renamed `@pai/*` → `@devos/*` (v0.2.x debrand).
 - Skill `version:` lines are upstream's, not DevOS's — diverge deliberately after 0.1.

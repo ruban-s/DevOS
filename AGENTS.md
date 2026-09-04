@@ -1,13 +1,13 @@
 # AGENTS.md
 
-Developer harness repo (DevOS v0.1). Own project lives at root: `SKILL.md` (orchestrator), `Workflows/`, `Tools/`, `RUNTIME/`, `skills/`, `hooks/`, `templates/`, `tests/`. `temp/reference/` is a frozen LifeOS snapshot for reading only (gitignored).
+Developer harness repo (DevOS v0.2.0). Own project lives at root: `SKILL.md` (orchestrator), `Workflows/`, `Tools/`, `RUNTIME/`, `skills/`, `hooks/`, `templates/`, `tests/`. `temp/reference/` is a frozen predecessor snapshot for reading only (gitignored).
 
 ## Boundary
 
 - Do not edit, move, or "fix" anything under `temp/`. Copy patterns out into the root project instead.
-- Do not run `temp/reference/LifeOS/install/install.sh` or `bun temp/reference/LifeOS/Tools/*.ts` — those tools assume LifeOS sits at the repo root and refuse inside a source tree. If borrowing an install/tool pattern, copy the file out first and re-resolve its `LifeOS/` / `install/` / `<configRoot>` paths.
+- Do not run `temp/reference/LifeOS/install/install.sh` or `bun temp/reference/LifeOS/Tools/*.ts` — those tools assume the reference harness sits at the repo root and refuse inside a source tree. If borrowing an install/tool pattern, copy the file out first and re-resolve its `LifeOS/` / `install/` / `<configRoot>` paths.
 - `temp/reference/AGENTS.md` and `temp/reference/SECURITY.md` describe the old repo, not this one. They apply only when reading reference code — never follow their install/deploy instructions here.
-- Root is not a git repo (LifeOS history lives in `temp/reference/.git`). Do not run git commands at root or init a repo unless the user asks.
+- Root is a git repo (`origin https://github.com/ruban-s/DevOS.git`, branch `main`). The reference snapshot's history lives separately in `temp/reference/.git` — never mix the two. Normal read-only git commands at root are fine; do not commit, push, or rewrite history unless the user asks.
 
 ## Conventions (root project)
 
@@ -19,5 +19,5 @@ Developer harness repo (DevOS v0.1). Own project lives at root: `SKILL.md` (orch
 
 ## Current state
 
-- DevOS v0.1 kernel complete (doctrine, tools, hooks, skills, global install, tests). Open item: live `~/.claude` install needs explicit user permission.
+- DevOS v0.2.0 kernel complete (doctrine, tools, hooks, skills, global install, tests). Open item: live `~/.claude` install needs explicit user permission.
 - No `opencode.json` instructions file. Keep repo-specific guidance in this file until the project outgrows it.

@@ -73,7 +73,7 @@ bun /path/to/DevOS/Tools/DeployCore.ts --target <repo> --apply
 bun /path/to/DevOS/Tools/ActivateImports.ts --target <repo> --apply
 ```
 
-**Big — global.** One install serves every repo from your machine config (`~/.claude/DEVOS/`), as a sibling of any LifeOS install — which it never touches:
+**Big — global.** One install serves every repo from your machine config (`~/.claude/DEVOS/`), as a sibling of any predecessor install — which it never touches:
 
 ```bash
 bun Tools/GlobalInstall.ts --config-root ~/.claude                 # plan
@@ -140,7 +140,7 @@ The suite has already caught real bugs: quoted YAML scalars keeping their quotes
 | `skills/` | 37 curated dev skills ([port log](skills/DEVOS-PORT.md)) |
 | `templates/` | ISA + dev-profile seeds |
 | `tests/` | Harness self-tests |
-| `temp/` | Scratch + frozen LifeOS snapshot (`temp/reference/`) — read-only, gitignored |
+| `temp/` | Scratch + frozen predecessor snapshot (`temp/reference/`) — read-only, gitignored |
 
 Conventions: additive installs only, permission before mutation, LF endings, `.toml` never `.yaml`. Component `version:` lines track `RUNTIME/VERSION` at release.
 
@@ -152,7 +152,7 @@ Stated plainly, so nobody discovers them mid-run:
 - **Hooks are Claude-only.** Other harnesses get the pointer + manual gates — same teeth, no automation.
 - **Web claims need real Chrome.** Without it, web output holds `[DEFERRED-VERIFY]`; weaker evidence is never substituted.
 - **Model-graded evals need the `claude` CLI.** Deterministic asserts run anywhere; judges don't.
-- **v0.1.** APIs, paths, and skill versions may shift before 1.0.
+- **v0.2.** APIs, paths, and skill versions may shift before 1.0.
 
 ## Credit
 
@@ -160,4 +160,4 @@ Built on [LifeOS](https://github.com/danielmiessler/LifeOS) by Daniel Miessler (
 
 ## License
 
-MIT — see [LICENSE](./LICENSE). Copyright (c) 2025–2026 Daniel Miessler (LifeOS portions), 2026 DevOS contributors (additions).
+MIT — see [LICENSE](./LICENSE). Copyright (c) 2026 DevOS contributors.

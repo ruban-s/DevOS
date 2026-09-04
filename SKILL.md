@@ -1,7 +1,7 @@
 ---
 name: DevOS
 version: 0.2.0
-description: Developer-only AI harness built on the LifeOS kernel — Algorithm loop, spec-as-ISA, verification gates. USE WHEN setting up the harness in a repo, running the project-spec interview, checking harness health, or updating the harness. NOT FOR life/TELOS onboarding (use LifeOS reference) or general coding help (just work in the repo directly).
+description: Developer-only AI harness — Algorithm loop, spec-as-ISA, verification gates. USE WHEN setting up the harness in a repo, running the project-spec interview, checking harness health, or updating the harness. NOT FOR life/TELOS onboarding (use the reference snapshot) or general coding help (just work in the repo directly).
 disable-model-invocation: true
 argument-hint: "[setup|spec|doctor|update]"
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep
@@ -9,7 +9,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 
 # DevOS
 
-The developer-harness distribution root. Mirrors the LifeOS skill shape, stripped to the kernel:
+The developer-harness distribution root. Kernel doctrine lives in `RUNTIME/`:
 
 - `RUNTIME/` — doctrine + constitution (`ALGORITHM/`, `RULES/Verification.md`, `SYSTEM_PROMPT.md`)
 - `Workflows/` — `Setup.md` (repo-local install), `Spec.md` (project-spec interview), `Update.md`
@@ -33,7 +33,7 @@ Default flow: **Setup** (repo-local install + verification) → **Spec** (repo s
 
 - **Additive, never clobbering.** All writes are `existsSync`-guarded copy-missing. Never overwrite or `rm` a populated file or foreign dir.
 - **Dry-run first.** Every tool prints its plan without `--apply` and writes nothing. Show the plan, then re-run with `--apply`.
-- **`temp/` is read-only scratch (frozen LifeOS snapshot under `temp/reference/`).** Borrow patterns by copying out; never edit, move, or run tools in place under `temp/`.
+- **`temp/` is read-only scratch (frozen predecessor snapshot under `temp/reference/`).** Borrow patterns by copying out; never edit, move, or run tools in place under `temp/`.
 
 ## Versioning
 
