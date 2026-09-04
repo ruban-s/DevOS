@@ -8,8 +8,10 @@ import { homedir } from "node:os";
 const HOME = homedir();
 /**
  * Harness root: $DEVOS_ROOT wins, else a repo-local install beside the cwd
- * (<repo>/DEVOS/SKILL.md), else the legacy global tree. NS selects the
- * runtime namespace inside it (DEVOS repo-local, LIFEOS legacy global).
+ * (<repo>/DEVOS/SKILL.md), else the machine-global config dir. NS selects the
+ * runtime namespace inside it (DEVOS for DevOS installs; the predecessor
+ * harness's namespace for memory written before migration — read path kept
+ * so pre-migration work stays recallable).
  */
 function resolveHarnessRoot(): string {
   if (process.env.DEVOS_ROOT && existsSync(process.env.DEVOS_ROOT)) return process.env.DEVOS_ROOT;
@@ -17,7 +19,7 @@ function resolveHarnessRoot(): string {
   return join(HOME, ".claude");
 }
 const DEVOS_DIR = resolveHarnessRoot();
-const NS = DEVOS_DIR.endsWith(".claude") ? "LIFEOS" : "DEVOS";
+const NS = DEVOS_DIR.endsWith(".claude") ? "LIFEOS" : "DEVOS"; // "LIFEOS" is the on-disk namespace of predecessor installs — functional, not branding; renaming it orphans pre-migration memory
 const STATE_DIR = join(DEVOS_DIR, NS, "MEMORY", "STATE");
 const WORK_DIR = join(DEVOS_DIR, NS, "MEMORY", "WORK");
 // Claude Code writes one transcript dir per working directory under
@@ -146,7 +148,7 @@ function parseArgs(argv: string[]): Args {
 }
 
 function printHelp() {
-  console.log(`ContextSearch — find prior LifeOS work by topic, tokens, or date.
+  console.log(`ContextSearch — find prior DevOS work by topic, tokens, or date.
 
 Usage:
   bun run ContextSearch.ts <query> [flags]

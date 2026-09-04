@@ -92,7 +92,7 @@ Suites bound to a particular operator identity (personal dispositions and the li
 
 ## What v1 left behind
 
-The old grader stack (`Graders/`, `TrialRunner.ts`) and the `@langwatch/scenario` path (`ScenarioRunner.ts`, `LifeosAgentAdapter.ts`) predate the assertion-first rewrite — prefer the v2 toolchain above. Multi-turn scenario runs additionally need `ANTHROPIC_API_KEY` in the environment (simulator and judge agents call the API directly) — keep principal work on the subscription-billed single-shot path.
+The old grader stack (`Graders/`, `TrialRunner.ts`) and the `@langwatch/scenario` path (`ScenarioRunner.ts`, `DevosAgentAdapter.ts`) predate the assertion-first rewrite — prefer the v2 toolchain above. Multi-turn scenario runs additionally need `ANTHROPIC_API_KEY` in the environment (simulator and judge agents call the API directly) — keep principal work on the subscription-billed single-shot path.
 
 ## Traps
 

@@ -1,8 +1,8 @@
 #!/usr/bin/env bun
 /**
- * LifeosAgentAdapter — wraps LifeOS's Inference.ts as a scenario AgentAdapter.
+ * DevosAgentAdapter — wraps DevOS's Inference.ts as a scenario AgentAdapter.
  *
- * Lets scenario.run() drive a LifeOS agent in multi-turn simulations without
+ * Lets scenario.run() drive a DevOS agent in multi-turn simulations without
  * pulling in the ai-sdk Anthropic provider for the agent-under-test path
  * (scenario's UserSimulatorAgent + JudgeAgent still use ai-sdk directly).
  */
@@ -10,21 +10,21 @@
 import { inference, type InferenceLevel } from '../../../DEVOS/Tools/Inference.ts';
 import { AgentAdapter, AgentRole, type AgentInput, type AgentReturnTypes } from '@langwatch/scenario';
 
-export interface LifeosAgentAdapterOptions {
+export interface DevosAgentAdapterOptions {
   systemPrompt?: string;
   level?: InferenceLevel;
   timeout?: number;
   name?: string;
 }
 
-export class LifeosAgentAdapter extends AgentAdapter {
+export class DevosAgentAdapter extends AgentAdapter {
   override role = AgentRole.AGENT;
   override name: string;
-  private opts: Required<Omit<LifeosAgentAdapterOptions, 'name'>>;
+  private opts: Required<Omit<DevosAgentAdapterOptions, 'name'>>;
 
-  constructor(options: LifeosAgentAdapterOptions = {}) {
+  constructor(options: DevosAgentAdapterOptions = {}) {
     super();
-    this.name = options.name ?? 'pai-agent';
+    this.name = options.name ?? 'devos-agent';
     this.opts = {
       systemPrompt: options.systemPrompt ?? 'You are a helpful assistant.',
       level: options.level ?? 'medium',
@@ -43,7 +43,7 @@ export class LifeosAgentAdapter extends AgentAdapter {
     });
 
     if (!result.success) {
-      throw new Error(`LifeosAgentAdapter inference failed: ${result.error ?? 'unknown error'}`);
+      throw new Error(`DevosAgentAdapter inference failed: ${result.error ?? 'unknown error'}`);
     }
 
     return result.output.trim();

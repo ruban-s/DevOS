@@ -14,7 +14,7 @@ export const meta = {
 
 // DeepVerifiedResearch: Scope -> parallel Explore(search+extract) -> Verify(fixed verifier pool) -> Synthesize.
 // Verification rigor is ported from Anthropic's deep-research (falsifiable claims, adversarial refutation,
-// quorum-kill, abstention guard) but the TOPOLOGY is LifeOS's fast parallel-explorer shape, not a 5-stage
+// quorum-kill, abstention guard) but the TOPOLOGY is DevOS's fast parallel-explorer shape, not a 5-stage
 // per-claim fan-out. The decisive speed/cost fix (2026-06-02): instead of N claims x 3 voter agents
 // (~60 agents, ~1M tokens, 5 min, and the voters died on turn-exhaustion), use a FIXED pool of 3
 // verifier agents that EACH judge the entire claim list from a distinct lens. Still 3 votes per claim,

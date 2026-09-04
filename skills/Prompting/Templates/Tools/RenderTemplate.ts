@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * RenderTemplate.ts - LifeOS Templating Engine
+ * RenderTemplate.ts - DevOS Templating Engine
  *
  * Renders Handlebars templates with YAML data sources.
  *
@@ -240,7 +240,7 @@ function main(): void {
 
   if (values.help || !values.template || !values.data) {
     console.log(`
-LifeOS Template Renderer
+DevOS Template Renderer
 
 Usage:
   bun run RenderTemplate.ts --template <path> --data <path> [options]

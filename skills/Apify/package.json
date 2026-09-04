@@ -1,8 +1,8 @@
 {
-  "name": "@pai/filesystem-mcp-apify",
+  "name": "@devos/filesystem-mcp-apify",
   "version": "1.0.0",
   "type": "module",
-  "description": "Code-first Apify interface for LifeOS - replaces token-heavy MCP calls",
+  "description": "Code-first Apify interface for DevOS - replaces token-heavy MCP calls",
   "main": "index.ts",
   "scripts": {
     "example": "bun run examples/instagram-scraper.ts"

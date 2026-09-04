@@ -26,7 +26,7 @@ Author a multi-turn scenario file: a simulated user drives a multi-turn conversa
    ```ts
    import { anthropic } from '@ai-sdk/anthropic';
    import scenario, { type ScenarioConfig } from '@langwatch/scenario';
-   import { LifeosAgentAdapter } from '../Tools/LifeosAgentAdapter.ts';
+   import { DevosAgentAdapter } from '../Tools/DevosAgentAdapter.ts';
 
    const judgeModel = anthropic('claude-sonnet-4-6');
 
@@ -34,7 +34,7 @@ Author a multi-turn scenario file: a simulated user drives a multi-turn conversa
      name: '<scenario-name>',
      description: '<what happens in plain English>',
      agents: [
-       new LifeosAgentAdapter({
+       new DevosAgentAdapter({
          name: '<agent-name>',
          systemPrompt: '<system prompt for the agent under test>',
          level: 'medium',
@@ -84,7 +84,7 @@ DEVOS/skills/Evals/
 ├── Scenarios/                       # authored scenarios live here
 │   └── <name>.scenario.ts
 ├── Tools/
-│   ├── LifeosAgentAdapter.ts           # wraps Inference.ts as scenario AgentAdapter
+│   ├── DevosAgentAdapter.ts           # wraps Inference.ts as scenario AgentAdapter
 │   ├── ScenarioRunner.ts            # CLI entrypoint
 │   └── ScenarioToTranscript.ts      # result → Evals types
 ```
