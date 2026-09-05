@@ -1,4 +1,7 @@
-# Dependencies (skills carry their own package.json; never commit installs)
+# Dependencies — never commit an installed tree. The root package.json holds
+# typecheck devDependencies only (nothing ships: PAYLOAD in Tools/lib.ts is an
+# allowlist). bun.lock IS committed on purpose — CI runs --frozen-lockfile, so
+# an unpinned typechecker would let CI go red with no change to this repo.
 node_modules/
 bun.lockb
 
@@ -13,6 +16,7 @@ bun.lockb
 DEVOS/MEMORY/
 MEMORY/
 checkpoints.jsonl
+checkpoint-state.json
 work.json
 doctor.json
 
