@@ -28,6 +28,12 @@ export const PAYLOAD: Array<[string, string]> = [
 /** MEMORY subdirs scaffolded (runtime state, no content). */
 export const MEMORY_DIRS = ["WORK", "STATE", "KNOWLEDGE", "LEARNING"];
 
+/** Managed-block markers. Sole definition — pointer detection matches these, never a bare "DEVOS/" mention. */
+export const IMPORTS_START = "<!-- devos-managed:imports:start -->";
+export const IMPORTS_END = "<!-- devos-managed:imports:end -->";
+export const GLOBAL_START = "<!-- devos-managed:global:start -->";
+export const GLOBAL_END = "<!-- devos-managed:global:end -->";
+
 const TEXT_EXT = new Set([".md", ".json", ".ts", ".toml", ".sh", ".txt", ".yml", ".yaml", ".py"]);
 
 /** Minimal `--flag` / `--key value` parser. */
@@ -68,39 +74,84 @@ export function readHarnessVersion(): string {
 
 export interface CopyReport { added: string[]; skipped: string[]; dirsMade: string[] }
 
-/** Recursive existsSync-guarded copy. Never overwrites. Returns repo-relative paths. */
-export function copyMissing(srcRoot: string, destRoot: string, base: string = destRoot): CopyReport {
-  const rep: CopyReport = { added: [], skipped: [], dirsMade: [] };
+interface PairEntry { rel: string; isDir: boolean; exists: boolean; src: string; dest: string }
+
+/**
+ * The one src→dest recursive walk (copy, dry-run plan, and install preview all
+ * ride on it). `exists` is sampled just before each visit, so a visitor that
+ * creates dest dirs still sees accurate state for the children below it.
+ */
+function walkPair(srcRoot: string, destRoot: string, base: string, visit: (e: PairEntry) => void): void {
   const walk = (src: string, dest: string): void => {
     if (!existsSync(src)) return;
     const st = statSync(src);
     if (st.isDirectory()) {
-      if (!existsSync(dest)) { mkdirSync(dest, { recursive: true }); rep.dirsMade.push(relative(base, dest) || "."); }
+      visit({ rel: relative(base, dest) || ".", isDir: true, exists: existsSync(dest), src, dest });
       for (const e of readdirSync(src).sort()) walk(join(src, e), join(dest, e));
     } else if (st.isFile()) {
-      if (existsSync(dest)) rep.skipped.push(relative(base, dest));
-      else { mkdirSync(dirname(dest), { recursive: true }); copyFileSync(src, dest); rep.added.push(relative(base, dest)); }
+      visit({ rel: relative(base, dest), isDir: false, exists: existsSync(dest), src, dest });
     }
   };
   walk(srcRoot, destRoot);
+}
+
+/** Recursive existsSync-guarded copy. Never overwrites. Returns repo-relative paths. */
+export function copyMissing(srcRoot: string, destRoot: string, base: string = destRoot): CopyReport {
+  const rep: CopyReport = { added: [], skipped: [], dirsMade: [] };
+  walkPair(srcRoot, destRoot, base, (e) => {
+    if (e.isDir) {
+      if (!e.exists) { mkdirSync(e.dest, { recursive: true }); rep.dirsMade.push(e.rel); }
+    } else if (e.exists) {
+      rep.skipped.push(e.rel);
+    } else {
+      mkdirSync(dirname(e.dest), { recursive: true });
+      copyFileSync(e.src, e.dest);
+      rep.added.push(e.rel);
+    }
+  });
   return rep;
 }
 
 /** Non-writing dry-run twin of copyMissing: reports would-add vs would-skip. */
 export function planCopy(srcRoot: string, destRoot: string, base: string = destRoot): { wouldAdd: string[]; wouldSkip: string[] } {
   const out = { wouldAdd: [] as string[], wouldSkip: [] as string[] };
-  const walk = (src: string, dest: string): void => {
-    if (!existsSync(src)) return;
-    const st = statSync(src);
-    if (st.isDirectory()) {
-      if (!existsSync(dest)) out.wouldAdd.push(`${relative(base, dest) || "."}/`);
-      for (const e of readdirSync(src).sort()) walk(join(src, e), join(dest, e));
-    } else if (st.isFile()) {
-      (existsSync(dest) ? out.wouldSkip : out.wouldAdd).push(relative(base, dest));
-    }
-  };
-  walk(srcRoot, destRoot);
+  walkPair(srcRoot, destRoot, base, (e) => {
+    if (e.isDir) { if (!e.exists) out.wouldAdd.push(`${e.rel}/`); }
+    else (e.exists ? out.wouldSkip : out.wouldAdd).push(e.rel);
+  });
   return out;
+}
+
+/** What upsertManagedBlock would do to `path`, without writing. */
+export function managedBlockMode(path: string, start: string, end: string): "create" | "refresh" | "append" {
+  if (!existsSync(path)) return "create";
+  const cur = readFileSync(path, "utf-8");
+  return cur.includes(start) && cur.includes(end) ? "refresh" : "append";
+}
+
+/** Write `want` between start/end markers: refresh in place, else append, else create with an `# title` heading. */
+export function upsertManagedBlock(path: string, start: string, end: string, want: string, title: string): "created" | "refreshed" | "appended" {
+  const mode = managedBlockMode(path, start, end);
+  if (mode === "create") { writeFileSync(path, `# ${title}\n\n${want}\n`); return "created"; }
+  const cur = readFileSync(path, "utf-8");
+  if (mode === "refresh") {
+    const esc = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const re = new RegExp(`${esc(start)}[\\s\\S]*?${esc(end)}`);
+    // Function replacement: block text is data, never a $-pattern for the replacer.
+    writeFileSync(path, cur.replace(re, () => want));
+    return "refreshed";
+  }
+  writeFileSync(path, cur.endsWith("\n") ? `${cur}\n${want}\n` : `${cur}\n\n${want}\n`);
+  return "appended";
+}
+
+/** True when the file carries a DevOS managed pointer block — not merely a mention of the path. */
+export function hasDevosPointerBlock(path: string): boolean {
+  if (!existsSync(path)) return false;
+  try {
+    const s = readFileSync(path, "utf-8");
+    return s.includes(IMPORTS_START) || s.includes(GLOBAL_START);
+  } catch { return false; }
 }
 
 /** Substitute known harness tokens in text files under root. Returns changed files (root-relative). */

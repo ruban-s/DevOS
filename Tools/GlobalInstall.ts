@@ -23,24 +23,45 @@
  */
 
 import { existsSync, readFileSync, writeFileSync, mkdirSync, readdirSync, copyFileSync, statSync, unlinkSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 import {
-  PAYLOAD, MEMORY_DIRS, HARNESS_NAME,
+  PAYLOAD, MEMORY_DIRS,
   parseArgs, emit, isDevTreeCheckout,
-  readHarnessVersion, copyMissing, substituteHarnessTokens,
+  readHarnessVersion, copyMissing, planCopy, substituteHarnessTokens,
   checkHarnessPlaceholders, detectHarness, detectAvailableAis,
   harnessInstallProfile, homeDir, SOURCE_ROOT,
+  GLOBAL_START, GLOBAL_END, managedBlockMode, upsertManagedBlock,
 } from "./lib";
 
-const CLAUDE_START = "<!-- devos-managed:global:start -->";
-const CLAUDE_END = "<!-- devos-managed:global:end -->";
-
 function claudeBlock(): string {
-  return `${CLAUDE_START}
+  return `${GLOBAL_START}
 ## DevOS harness (global install)
 
 DevOS lives at \`DEVOS/\` (sibling of any predecessor \`LIFEOS/\` install — neither touches the other). Harness contract: \`DEVOS/SKILL.md\`; constitution: \`DEVOS/RUNTIME/SYSTEM_PROMPT.md\`; spec format: \`DEVOS/RUNTIME/ISA_FORMAT.md\`. Route DevOS work (setup/spec/doctor/update) through \`DEVOS/SKILL.md\`; repo-local installs additionally carry their own \`DEVOS/\` plus an \`ISA.md\` spec.
-${CLAUDE_END}`;
+${GLOBAL_END}`;
+}
+
+/**
+ * Sorted path+size+mtime lines for a tree — the evidence behind the
+ * sibling-safety claim. Unreadable entries digest to a stable marker so a
+ * permission quirk reads as "unchanged", never as a spurious touch.
+ */
+function treeDigest(root: string): string[] {
+  const out: string[] = [];
+  const walk = (dir: string): void => {
+    let entries: string[];
+    try { entries = readdirSync(dir).sort(); } catch { out.push(`${relative(root, dir)}/<unreadable>`); return; }
+    for (const e of entries) {
+      const p = join(dir, e);
+      const rel = relative(root, p);
+      let st;
+      try { st = statSync(p); } catch { out.push(`${rel}\t<unstattable>`); continue; }
+      if (st.isDirectory()) { out.push(`${rel}/`); walk(p); }
+      else out.push(`${rel}\t${st.size}\t${st.mtimeMs}`);
+    }
+  };
+  if (existsSync(root)) walk(root);
+  return out;
 }
 
 function hookEntries(devosDir: string): Array<{ event: string; matcher?: string; command: string; timeout?: number }> {
@@ -92,7 +113,8 @@ function main(): void {
   try { version = readHarnessVersion(); } catch (e) { emit({ ok: false, error: String(e) }, 1); }
 
   // Sibling-safety preflight (both modes): a predecessor LIFEOS install must survive untouched.
-  const predecessorPresent = existsSync(join(configRoot, "LIFEOS"));
+  const predecessorDir = join(configRoot, "LIFEOS");
+  const predecessorPresent = existsSync(predecessorDir);
   const settingsPath = join(configRoot, "settings.json");
   const claudeMdPath = join(configRoot, "CLAUDE.md");
   const settingsExists = existsSync(settingsPath);
@@ -120,36 +142,39 @@ function main(): void {
   }
 
   const claudeMdPresent = existsSync(claudeMdPath);
-  const claudeMdHasBlock = claudeMdPresent && readFileSync(claudeMdPath, "utf-8").includes(CLAUDE_START);
+  const claudeMdHasBlock = claudeMdPresent && readFileSync(claudeMdPath, "utf-8").includes(GLOBAL_START);
 
   if (!apply) {
     const deploy: string[] = [];
     for (const [src, rel] of PAYLOAD) {
-      const walk = (s: string, d: string): void => {
-        if (!existsSync(s)) return;
-        const stat = statSync(s);
-        if (stat.isDirectory()) {
-          if (!existsSync(d)) deploy.push(`DIR ${d.replace(configRoot + "/", "")}/`);
-          for (const e of readdirSync(s).sort()) walk(join(s, e), join(d, e));
-        } else if (!existsSync(d)) deploy.push(d.replace(configRoot + "/", ""));
-      };
-      walk(join(SOURCE_ROOT, src), join(devosDir, rel));
+      const plan = planCopy(join(SOURCE_ROOT, src), join(devosDir, rel), configRoot);
+      deploy.push(...plan.wouldAdd.map((p) => (p.endsWith("/") ? `DIR ${p}` : p)));
     }
     emit({
       ok: true, dryRun: true, configRoot, harness, version,
       availableAis,
-      siblingSafety: { predecessorPresent, predecessorTouched: false },
+      siblingSafety: {
+        predecessorPresent, predecessorPath: predecessorDir,
+        predecessorEntries: treeDigest(predecessorDir).length,
+        note: "dry run writes nothing — no predecessorTouched claim to verify here",
+      },
       wouldDeploy: deploy.slice(0, 30), wouldDeployTotal: deploy.length,
       memoryDirs: MEMORY_DIRS.map((d) => `DEVOS/MEMORY/${d}`),
-      claudeMd: { present: claudeMdPresent, hasBlock: claudeMdHasBlock, wouldWrite: wireClaudeMd && (!claudeMdPresent || !claudeMdHasBlock) },
+      claudeMd: {
+        present: claudeMdPresent, hasBlock: claudeMdHasBlock,
+        mode: wireClaudeMd ? `would-${managedBlockMode(claudeMdPath, GLOBAL_START, GLOBAL_END)}` : null,
+      },
       settings: settingsPlan,
       note: wireHooks
         ? "dry run — settings.json untouched; --apply backs it up (rotation of 5) before merging"
-        : "dry run — nothing written; re-run with --apply" + (claudeish ? "" : "; non-Claude harness: AGENTS.md pointer mode, hooks unavailable (by design)"),
+        : "dry run — nothing written; re-run with --apply" + (claudeish ? "" : `; non-Claude harness: ${harnessInstallProfile(harness.name).pointer} pointer mode, hooks unavailable (by design)`),
     }, 0);
   }
 
   // --- apply ---
+  // Snapshot the predecessor before any write, re-read after: predecessorTouched
+  // is measured, never asserted.
+  const predecessorBefore = treeDigest(predecessorDir);
   const added: string[] = [];
   const skipped: string[] = [];
   for (const [src, rel] of PAYLOAD) {
@@ -162,18 +187,8 @@ function main(): void {
   const placeholders = checkHarnessPlaceholders(devosDir);
 
   const writes: Record<string, string> = {};
-  if (wireClaudeMd && (!claudeMdPresent || !claudeMdHasBlock)) {
-    const want = claudeBlock();
-    if (!claudeMdPresent) {
-      writeFileSync(claudeMdPath, `# CLAUDE.md\n\n${want}\n`);
-      writes["claudeMd"] = "created";
-    } else {
-      const cur = readFileSync(claudeMdPath, "utf-8");
-      writeFileSync(claudeMdPath, cur.endsWith("\n") ? `${cur}\n${want}\n` : `${cur}\n\n${want}\n`);
-      writes["claudeMd"] = "appended";
-    }
-  } else if (wireClaudeMd) {
-    writes["claudeMd"] = "already-wired";
+  if (wireClaudeMd) {
+    writes["claudeMd"] = upsertManagedBlock(claudeMdPath, GLOBAL_START, GLOBAL_END, claudeBlock(), "CLAUDE.md");
   }
 
   if (wireHooks && settingsParsed) {
@@ -219,24 +234,30 @@ function main(): void {
     // Non-Claude harness: pointer file per the harness profile + honest degrade
     // (never hooks). Pointer lives at the install root, never in IDE-owned dirs.
     const profile = harnessInstallProfile(harness.name);
-    const agents = join(configRoot, profile.pointer);
-    const start = "<!-- devos-managed:global:start -->";
-    if (!existsSync(agents) || !readFileSync(agents, "utf-8").includes(start)) {
-      const who = harness.name === "other" ? "this machine (no supported AI harness detected)" : harness.name;
-      const pointer = `${start}\n## DevOS harness (global install for ${who}, hooks unwired)\n\nDevOS lives at \`DEVOS/\`. Always-on hooks are a Claude-Code mechanism: no hook files were written here and none will fire. Route DevOS work through \`DEVOS/SKILL.md\`; enforcement gates run by hand (\`bun DEVOS/Tools/ISAGate.ts <isa>\`, \`bun DEVOS/Tools/Doctor.ts\`).\n<!-- devos-managed:global:end -->\n`;
-      if (!existsSync(agents)) writeFileSync(agents, `# ${profile.pointer}\n\n${pointer}`);
-      else {
-        const cur = readFileSync(agents, "utf-8");
-        writeFileSync(agents, cur.endsWith("\n") ? `${cur}\n${pointer}` : `${cur}\n\n${pointer}`);
-      }
-      writes["pointerFile"] = `${profile.pointer}:written`;
-    } else writes["pointerFile"] = `${profile.pointer}:already-wired`;
+    const who = harness.name === "other" ? "this machine (no supported AI harness detected)" : harness.name;
+    const pointer = `${GLOBAL_START}\n## DevOS harness (global install for ${who}, hooks unwired)\n\nDevOS lives at \`DEVOS/\`. Always-on hooks are a Claude-Code mechanism: no hook files were written here and none will fire. Route DevOS work through \`DEVOS/SKILL.md\`; enforcement gates run by hand (\`bun DEVOS/Tools/ISAGate.ts <isa>\`, \`bun DEVOS/Tools/Doctor.ts\`).\n${GLOBAL_END}`;
+    const mode = upsertManagedBlock(join(configRoot, profile.pointer), GLOBAL_START, GLOBAL_END, pointer, profile.pointer);
+    writes["pointerFile"] = `${profile.pointer}:${mode}`;
   }
+
+  const predecessorAfter = treeDigest(predecessorDir);
+  const beforeSet = new Set(predecessorBefore);
+  const afterSet = new Set(predecessorAfter);
+  const predecessorChanged = [
+    ...predecessorBefore.filter((x) => !afterSet.has(x)),
+    ...predecessorAfter.filter((x) => !beforeSet.has(x)),
+  ];
 
   emit({
     ok: true, configRoot, harness, version,
     availableAis,
-    siblingSafety: { predecessorPresent, predecessorTouched: false },
+    siblingSafety: {
+      predecessorPresent, predecessorPath: predecessorDir,
+      predecessorEntries: predecessorBefore.length,
+      predecessorTouched: predecessorChanged.length > 0,
+      predecessorChanged: predecessorChanged.slice(0, 20),
+      evidence: "path+size+mtime digest compared before and after this run's writes",
+    },
     added, skippedExisting: skipped.length, substituted,
     survivingPlaceholders: placeholders, writes,
   }, 0);

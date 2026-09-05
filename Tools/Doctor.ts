@@ -2,11 +2,12 @@
 /**
  * Doctor — DevOS capability prober and advisory manifest writer.
  *
- * Four states: live | broken | declined | stale. Declined is first-class and
+ * Three states: live | broken | declined. Declined is first-class and
  * permanently silent — opted-out is not a defect. No scores, no percentages.
  * Never install-fatal: default run exits 0, every probe is timeout-bounded,
  * network probes are opt-in (--network) and only fire for configured caps.
- * The manifest is a TTL'd advisory CACHE, never truth — gates re-verify live.
+ * Every run re-probes from scratch; the manifest it leaves behind is an
+ * advisory record of that run, never truth — gates re-verify live.
  *
  * Usage:
  *   bun Tools/Doctor.ts [--target <dir>]            # probe, table output
@@ -19,14 +20,13 @@
 
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { parseArgs, emit, resolveTarget } from "./lib";
+import { parseArgs, emit, resolveTarget, hasDevosPointerBlock } from "./lib";
 
-type CapState = "live" | "broken" | "declined" | "stale";
+type CapState = "live" | "broken" | "declined";
 
 interface CapResult {
   state: CapState;
   checkedAt: string;
-  ttlHours: number;
   detail: string;
   fix: string | null;
   probeClass: "offline" | "network";
@@ -40,14 +40,13 @@ interface Manifest {
   capabilities: Record<string, CapResult>;
 }
 
-const TTL_HOURS = 24;
 const PROBE_TIMEOUT = 10_000;
 
 function which(bin: string): string | null {
   try { return Bun.which(bin); } catch { return null; }
 }
 
-async function cmd(argv: string[], network: boolean): Promise<{ ok: boolean; out: string }> {
+async function cmd(argv: string[]): Promise<{ ok: boolean; out: string }> {
   try {
     const proc = Bun.spawn(argv, { stdout: "pipe", stderr: "pipe" });
     const timer = setTimeout(() => { try { proc.kill(); } catch { /* already exited */ } }, PROBE_TIMEOUT);
@@ -65,7 +64,7 @@ interface CapSpec {
   title: string;
   required: boolean;
   probeClass: "offline" | "network";
-  probe: (network: boolean, target: string) => Promise<Omit<CapResult, "state" | "checkedAt" | "ttlHours"> & { live: boolean }>;
+  probe: (network: boolean, target: string) => Promise<Omit<CapResult, "state" | "checkedAt"> & { live: boolean }>;
 }
 
 const CAPS: CapSpec[] = [
@@ -83,7 +82,7 @@ const CAPS: CapSpec[] = [
     probe: async () => {
       const p = which("git");
       if (!p) return { live: false, detail: "git not on PATH", fix: "install git (xcode-select --install / apt install git)", probeClass: "offline" };
-      const r = await cmd(["git", "--version"], false);
+      const r = await cmd(["git", "--version"]);
       return { live: r.ok, detail: r.ok ? r.out : "git present but --version failed", fix: r.ok ? null : "reinstall git", probeClass: "offline" };
     },
   },
@@ -92,7 +91,7 @@ const CAPS: CapSpec[] = [
     probe: async () => {
       const p = which("node");
       if (!p) return { live: false, detail: "node not on PATH (info only — needed only for node target stacks)", fix: "install node LTS", probeClass: "offline" };
-      const r = await cmd(["node", "--version"], false);
+      const r = await cmd(["node", "--version"]);
       return { live: true, detail: r.out || "node present", fix: null, probeClass: "offline" };
     },
   },
@@ -120,7 +119,7 @@ const CAPS: CapSpec[] = [
       const p = which("gh");
       if (!p) return { live: false, detail: "gh not on PATH — work capture to issues unavailable", fix: "brew install gh && gh auth login", probeClass: "offline" };
       if (!network) return { live: true, detail: `gh at ${p} (auth unchecked — re-run with --network)`, fix: null, probeClass: "offline" };
-      const r = await cmd(["gh", "auth", "status"], true);
+      const r = await cmd(["gh", "auth", "status"]);
       return r.ok
         ? { live: true, detail: "gh authenticated", fix: null, probeClass: "network" }
         : { live: false, detail: "gh present but not authenticated", fix: "gh auth login", probeClass: "network" };
@@ -143,13 +142,10 @@ const CAPS: CapSpec[] = [
       const skill = join(target, "DEVOS", "SKILL.md");
       if (!existsSync(skill)) return { live: false, detail: `no DEVOS install at ${target}`, fix: "bun <devos-checkout>/Tools/DeployCore.ts --target <repo> --apply", probeClass: "offline" };
       const verFile = join(target, "DEVOS", "RUNTIME", "VERSION");
-      const agents = join(target, "AGENTS.md");
-      const claudeMd = join(target, "CLAUDE.md");
       const problems: string[] = [];
       if (!existsSync(verFile)) problems.push("DEVOS/RUNTIME/VERSION missing");
-      const pointed = (existsSync(agents) && readFileSync(agents, "utf-8").includes("DEVOS/")) ||
-        (existsSync(claudeMd) && readFileSync(claudeMd, "utf-8").includes("DEVOS/"));
-      if (!pointed) problems.push("no DEVOS pointer block in AGENTS.md or CLAUDE.md");
+      const pointed = hasDevosPointerBlock(join(target, "AGENTS.md")) || hasDevosPointerBlock(join(target, "CLAUDE.md"));
+      if (!pointed) problems.push("no DEVOS managed pointer block in AGENTS.md or CLAUDE.md");
       return problems.length === 0
         ? { live: true, detail: `DEVOS present (${readFileSync(verFile, "utf-8").trim()}) with pointer block`, fix: null, probeClass: "offline" }
         : { live: false, detail: problems.join("; "), fix: "re-run DeployCore --apply, then ActivateImports --apply", probeClass: "offline" };
@@ -162,7 +158,8 @@ function loadManifest(stateDir: string): Manifest {
   try {
     if (existsSync(f)) {
       const m = JSON.parse(readFileSync(f, "utf-8")) as Manifest;
-      if (m.version === 1) return { declined: [], ackedBroken: [], ...m };
+      // Spread first: a hand-edited manifest missing these must not yield undefined.
+      if (m.version === 1) return { ...m, declined: m.declined ?? [], ackedBroken: m.ackedBroken ?? [], capabilities: m.capabilities ?? {} };
     }
   } catch { /* corrupt — rebuild */ }
   return { version: 1, updatedAt: new Date().toISOString(), declined: [], ackedBroken: [], capabilities: {} };
@@ -170,7 +167,7 @@ function loadManifest(stateDir: string): Manifest {
 
 function table(results: Record<string, CapResult>): string {
   const rows = Object.entries(results).map(([id, r]) => {
-    const glyph = r.state === "live" ? "✅" : r.state === "broken" ? "❌" : r.state === "declined" ? "➖" : "🕰️";
+    const glyph = r.state === "live" ? "✅" : r.state === "broken" ? "❌" : "➖";
     return `${glyph} ${id} [${r.state}] — ${r.detail}${r.fix ? `\n    fix: ${r.fix}` : ""}`;
   });
   const broken = Object.entries(results).filter(([, r]) => r.state === "broken");
@@ -214,14 +211,14 @@ async function main(): Promise<void> {
   const results: Record<string, CapResult> = {};
   for (const cap of CAPS) {
     if (manifest.declined.includes(cap.id)) {
-      results[cap.id] = { state: "declined", checkedAt: manifest.updatedAt, ttlHours: TTL_HOURS, detail: "opted out — silent", fix: null, probeClass: cap.probeClass };
+      results[cap.id] = { state: "declined", checkedAt: manifest.updatedAt, detail: "opted out — silent", fix: null, probeClass: cap.probeClass };
       continue;
     }
     try {
       const r = await cap.probe(network, target);
-      results[cap.id] = { state: r.live ? "live" : "broken", checkedAt: new Date().toISOString(), ttlHours: TTL_HOURS, detail: r.detail, fix: r.fix, probeClass: r.probeClass };
+      results[cap.id] = { state: r.live ? "live" : "broken", checkedAt: new Date().toISOString(), detail: r.detail, fix: r.fix, probeClass: r.probeClass };
     } catch (e) {
-      results[cap.id] = { state: "broken", checkedAt: new Date().toISOString(), ttlHours: TTL_HOURS, detail: `probe crashed: ${String(e)}`, fix: null, probeClass: cap.probeClass };
+      results[cap.id] = { state: "broken", checkedAt: new Date().toISOString(), detail: `probe crashed: ${String(e)}`, fix: null, probeClass: cap.probeClass };
     }
   }
 

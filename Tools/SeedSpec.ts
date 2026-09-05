@@ -52,8 +52,9 @@ function main(): void {
   let s = readFileSync(seedPath, "utf-8");
   for (const [k, v] of Object.entries(vars)) s = s.split(k).join(v);
 
-  // Tokens the interview must still resolve (project/owner meaning).
-  const remaining = [...s.matchAll(/\{\{[A-Z_]+\}\}/g)].map((m) => m[0]);
+  // Every surviving token, not just SCREAMING_CASE — the seed also carries
+  // lowercase alternation placeholders like {{bash|curl|test|...}}.
+  const remaining = [...s.matchAll(/\{\{[^{}\n]+\}\}/g)].map((m) => m[0]);
   const remainingUnique = [...new Set(remaining)].sort();
 
   if (!apply) {

@@ -9,12 +9,11 @@
 
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { detectHarness, homeDir, isDevTreeCheckout, resolveTarget, SOURCE_ROOT } from "./lib";
+import { detectHarness, homeDir, isDevTreeCheckout, parseArgs, resolveTarget, SOURCE_ROOT } from "./lib";
 
 function main(): void {
-  const a = process.argv.slice(2);
-  const ti = a.indexOf("--target");
-  const target = resolveTarget(ti >= 0 ? a[ti + 1] : undefined);
+  const { get } = parseArgs(process.argv.slice(2));
+  const target = resolveTarget(get("--target"));
   const home = homeDir();
   const harness = detectHarness(home);
   const devosDir = join(target, "DEVOS");

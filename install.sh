@@ -17,6 +17,12 @@
 # separate permission gate. No sudo, no writes outside <config-root>, no
 # network beyond the tarball fetch. Safe to re-run (idempotent).
 #
+# Downloads: every fetched tarball is hashed and the hash printed. Set
+# DEVOS_EXPECTED_SHA256=<hash> and the script verifies it and aborts on
+# mismatch. Leave it unset — the default — and NOTHING verifies the archive;
+# the script says so loudly on stderr and continues. There is no pinned hash
+# baked in, so the stock one-liner trusts GitHub + TLS, nothing more.
+#
 set -u
 set -o pipefail
 
@@ -34,7 +40,7 @@ WIRE_HOOKS=0
 SOURCE=""
 
 usage() {
-  sed -n '2,20p' "$0"
+  sed -n '2,25p' "$0"
   echo "Flags: --config-root DIR --source DIR|URL --apply --yes --with-bun --wire-claude-md --wire-hooks"
   exit "${1:-0}"
 }
@@ -55,10 +61,35 @@ done
 [ -n "${DEVOS_SOURCE:-}" ] && [ -z "$SOURCE" ] && SOURCE="$DEVOS_SOURCE"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-WORK=""; CLEANUP=0
+WORK=""
 
 log() { printf '%s\n' "$*"; }
+warn() { printf 'warning: %s\n' "$*" >&2; }
 die() { printf 'error: %s\n' "$*" >&2; exit 1; }
+
+# Hash every downloaded tarball. Verify when DEVOS_EXPECTED_SHA256 is set;
+# otherwise say plainly that nothing verified it. Never silently proceed.
+checksum_gate() {
+  f="$1"
+  if command -v sha256sum >/dev/null 2>&1; then sha="$(sha256sum "$f" | cut -d' ' -f1)"
+  elif command -v shasum >/dev/null 2>&1; then sha="$(shasum -a 256 "$f" | cut -d' ' -f1)"
+  else sha=""; fi
+
+  if [ -n "$DEVOS_EXPECTED_SHA256" ]; then
+    [ -n "$sha" ] || die "DEVOS_EXPECTED_SHA256 is set but neither sha256sum nor shasum is available to check it. Aborting (nothing was installed)."
+    [ "$sha" = "$DEVOS_EXPECTED_SHA256" ] \
+      || die "checksum mismatch — expected $DEVOS_EXPECTED_SHA256, got $sha. Aborting (nothing was installed)."
+    log "sha256: $sha (VERIFIED against DEVOS_EXPECTED_SHA256)"
+  elif [ -n "$sha" ]; then
+    log "sha256: $sha"
+    warn "UNVERIFIED DOWNLOAD — DEVOS_EXPECTED_SHA256 is not set, so nothing checked this archive"
+    warn "against a known-good hash. You are about to run code fetched over the network on trust"
+    warn "in GitHub + TLS alone. To pin it: confirm the hash above from a trusted channel, then"
+    warn "re-run with DEVOS_EXPECTED_SHA256=<hash>."
+  else
+    warn "UNVERIFIED DOWNLOAD — no sha256sum/shasum on PATH, so the archive could not even be hashed."
+  fi
+}
 
 # --- bun ---------------------------------------------------------------
 install_bun() {
@@ -99,17 +130,10 @@ if [ -z "$SOURCE" ]; then
     URL="https://github.com/$DEVOS_REPO/archive/refs/tags/v$DEVOS_VERSION.tar.gz"
   fi
   WORK="$(mktemp -d "${TMPDIR:-/tmp}/devos-install.XXXXXX")"
-  CLEANUP=1
   trap 'rm -rf "$WORK"' EXIT
   log "fetch: $URL"
   curl -fsSL --retry 3 -o "$WORK/devos.tar.gz" "$URL" || die "download failed: $URL"
-  if command -v sha256sum >/dev/null 2>&1; then SHA="$(sha256sum "$WORK/devos.tar.gz" | cut -d' ' -f1)";
-  elif command -v shasum >/dev/null 2>&1; then SHA="$(shasum -a 256 "$WORK/devos.tar.gz" | cut -d' ' -f1)";
-  else SHA="unavailable (no sha256sum/shasum)"; fi
-  log "sha256: $SHA"
-  if [ -n "$DEVOS_EXPECTED_SHA256" ] && [ "$SHA" != "$DEVOS_EXPECTED_SHA256" ]; then
-    die "checksum mismatch — expected $DEVOS_EXPECTED_SHA256, got $SHA. Aborting (nothing was installed)."
-  fi
+  checksum_gate "$WORK/devos.tar.gz"
   tar -xzf "$WORK/devos.tar.gz" -C "$WORK" || die "extract failed"
   SOURCE="$(echo "$WORK"/*/ | head -n 1)"
   SOURCE="${SOURCE%/}"
@@ -118,7 +142,6 @@ elif [ -d "$SOURCE" ]; then
   log "source: local dir ($SOURCE)"
 elif [ -f "$SOURCE" ]; then
   WORK="$(mktemp -d "${TMPDIR:-/tmp}/devos-install.XXXXXX")"
-  CLEANUP=1
   trap 'rm -rf "$WORK"' EXIT
   tar -xzf "$SOURCE" -C "$WORK" || die "extract failed: $SOURCE"
   SOURCE="$(echo "$WORK"/*/ | head -n 1)"; SOURCE="${SOURCE%/}"
@@ -128,10 +151,10 @@ else
   case "$SOURCE" in
     http://*|https://*|file://*)
       WORK="$(mktemp -d "${TMPDIR:-/tmp}/devos-install.XXXXXX")"
-      CLEANUP=1
       trap 'rm -rf "$WORK"' EXIT
       log "fetch: $SOURCE"
       curl -fsSL --retry 3 -o "$WORK/devos.tar.gz" "$SOURCE" || die "download failed"
+      checksum_gate "$WORK/devos.tar.gz"
       tar -xzf "$WORK/devos.tar.gz" -C "$WORK" || die "extract failed"
       SOURCE="$(echo "$WORK"/*/ | head -n 1)"; SOURCE="${SOURCE%/}"
       [ -d "$SOURCE" ] || SOURCE="$WORK"
