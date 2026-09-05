@@ -1,5 +1,5 @@
 {
-  "$comment": "DevOS hook wiring (v0.1). Claude-Code-shaped; other harnesses read hook stdout. ${CLAUDE_PROJECT_DIR} resolves to the target repo root — hooks + tools run repo-local from DEVOS/. Wire manually (Phase 7 automates this): copy this file's entries into the harness settings. Every hook fails open and exits 0 — a hook must never be why a turn breaks. Env kills: ISAGATE_OFF=1, VERIFICATIONGATE_OFF=1, ALGORITHMNUDGE_OFF=1.",
+  "$comment": "DevOS hook wiring. Claude-Code-shaped; other harnesses read hook stdout. ${CLAUDE_PROJECT_DIR} resolves to the target repo root — hooks + tools run repo-local from DEVOS/. This file is the repo-local reference: copy its entries into the harness settings by hand. A global install wires the same set automatically via hookEntries() in Tools/GlobalInstall.ts with absolute paths; keep the two in sync when adding a hook. Order is not load-bearing — each hook owns its own state. Every hook fails open and exits 0 — a hook must never be why a turn breaks. Env kills: ISAGATE_OFF=1, VERIFICATIONGATE_OFF=1, ALGORITHMNUDGE_OFF=1.",
   "hooks": {
     "PreToolUse": [
       {

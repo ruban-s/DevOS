@@ -19,10 +19,20 @@ import { findIsas, readIsa } from "../Tools/isa";
 
 const DEPTH_RE = /\b(go heavy|go deep|quick pass|think (deeply|hard)|take your time|be thorough|full (audit|review))\b/i;
 
+// Flag order, separated/long flags, quoting and brace expansion all walked
+// through the first cut of these — a false positive costs one explanation,
+// a false negative costs a home directory.
+const RM_FLAG = String.raw`-[a-zA-Z]+|--[a-z-]*`;
+const RM_RECURSIVE = String.raw`-[a-zA-Z]*[rR][a-zA-Z]*|--recursive`;
+const HOME_ROOT_PATH = String.raw`['"]?(?:~|\$\{?HOME\}?|/|\*)`;
+
 const DESTRUCTIVE: Array<{ re: RegExp; what: string }> = [
-  { re: /\brm\s+-rf?\s+(~|\$HOME|\/|\*)/, what: "recursive delete of a home/root-wide path" },
-  { re: /\bgit\s+push\s+.*--force/, what: "forced push (rewrites shared history)" },
-  { re: /\bgit\s+(reset\s+--hard|clean\s+-fd)/, what: "destructive git operation (destroys uncommitted work)" },
+  {
+    re: new RegExp(String.raw`\brm(?:\s+(?:${RM_FLAG}))*\s+(?:${RM_RECURSIVE})(?:\s+(?:${RM_FLAG}))*\s+${HOME_ROOT_PATH}`),
+    what: "recursive delete of a home/root-wide path",
+  },
+  { re: /\bgit\s+push\b[^\n;|&]*\s(?:--force\b|-[a-zA-Z]*f\b|\+\S)/, what: "forced push (rewrites shared history)" },
+  { re: /\bgit\s+(reset\s+--hard|clean\b[^\n;|&]*\s-[a-zA-Z]*f)/, what: "destructive git operation (destroys uncommitted work)" },
   { re: /\b(DROP\s+(TABLE|DATABASE)|drop\s+--force)/, what: "destructive database operation" },
   { re: /\bwrangler\s+(delete|destroy)/, what: "destructive infra delete" },
   { re: /\b(delete-bucket|delete-domain|delete-zone|records.*--delete)\b/, what: "provider-side delete" },

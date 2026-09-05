@@ -1,12 +1,15 @@
 #!/usr/bin/env bun
 /**
  * CheckpointPerISC.hook.ts — PostToolUse (Write|Edit on ISA.md). Diffs checked
- * claim IDs against the work.json mirror and appends newly-closed claims to
- * DEVOS/MEMORY/STATE/checkpoints.jsonl (one JSON object per line). Telemetry
- * only — never blocks, never writes the ISA. Fail open, always exit 0.
+ * claim IDs against its OWN baseline (DEVOS/MEMORY/STATE/checkpoint-state.json)
+ * and appends newly-closed claims to DEVOS/MEMORY/STATE/checkpoints.jsonl (one
+ * JSON object per line). The baseline is private on purpose: ISASync binds the
+ * same event and overwrites work.json's checkedIds, so sharing it made the log
+ * depend on hook registration order. Telemetry only — never blocks, never
+ * writes the ISA. Fail open, always exit 0.
  */
 
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, mkdirSync, appendFileSync } from "node:fs";
 import { join, dirname, basename } from "node:path";
 import { readHookInput, pass } from "./lib/hook-io";
 import { readIsa, findDevosRoot } from "../Tools/isa";
@@ -25,21 +28,20 @@ async function main(): Promise<void> {
     const root = findDevosRoot(dirname(fp!)) || input?.cwd || process.cwd();
     const stateDir = join(root, "DEVOS", "MEMORY", "STATE");
     mkdirSync(stateDir, { recursive: true });
-    const workFile = join(stateDir, "work.json");
-    let prevChecked: string[] = [];
+    const seenFile = join(stateDir, "checkpoint-state.json");
+    let seen: Record<string, string[]> = {};
     try {
-      if (existsSync(workFile)) {
-        const work = JSON.parse(readFileSync(workFile, "utf-8")) as { isas?: Record<string, { checkedIds?: string[] }> };
-        prevChecked = work.isas?.[slug]?.checkedIds || [];
-      }
+      const parsed = existsSync(seenFile) ? JSON.parse(readFileSync(seenFile, "utf-8")) : null;
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) seen = parsed as typeof seen;
     } catch { /* corrupt state — treat everything as new, still just telemetry */ }
 
-    const fresh = nowChecked.filter((id) => !prevChecked.includes(id));
+    const fresh = nowChecked.filter((id) => !(seen[slug] || []).includes(id));
+    seen[slug] = nowChecked;
+    writeFileSync(seenFile, JSON.stringify(seen, null, 2));
+
     if (fresh.length > 0) {
       const line = JSON.stringify({ ts: new Date().toISOString(), slug, closed: fresh, progress: isa.progress }) + "\n";
-      const log = join(stateDir, "checkpoints.jsonl");
-      const prev = existsSync(log) ? readFileSync(log, "utf-8") : "";
-      writeFileSync(log, prev + line);
+      appendFileSync(join(stateDir, "checkpoints.jsonl"), line);
     }
     pass();
   } catch {

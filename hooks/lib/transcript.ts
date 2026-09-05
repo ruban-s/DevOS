@@ -2,8 +2,8 @@
 /**
  * DevOS hooks/lib/transcript.ts — minimal transcript reader.
  * Parses harness JSONL transcripts for two facts gates need:
- * which files were edited this turn, and what tool evidence exists.
- * Unknown shapes are skipped, never fatal — gates fail open.
+ * which files the session edited, and what tool evidence the CURRENT TURN
+ * carries. Unknown shapes are skipped, never fatal — gates fail open.
  */
 
 import { existsSync, readFileSync } from "node:fs";
@@ -53,11 +53,36 @@ export function editedFiles(transcriptPath: string): string[] {
   return [...found];
 }
 
-/** Tool uses + assistant prose in the transcript (whole session — gates scope by turn where cheap). */
-export function evidence(transcriptPath: string): Evidence {
+/** A real human prompt — tool results are user-shaped too, and never open a turn. */
+function isUserPrompt(obj: Record<string, unknown>): boolean {
+  const msg = obj["message"] as Record<string, unknown> | undefined;
+  const role = msg?.["role"] ?? obj["role"];
+  if (obj["type"] !== "user" && role !== "user") return false;
+  if (obj["isMeta"] === true) return false;
+  const content = msg?.["content"] ?? obj["content"];
+  if (typeof content === "string") return content.trim() !== "";
+  if (Array.isArray(content)) {
+    return !content.some((b) => b && typeof b === "object" && (b as Record<string, unknown>)["type"] === "tool_result");
+  }
+  return false;
+}
+
+/**
+ * Tool uses + assistant prose since the last human prompt (the current turn).
+ * null when no turn boundary is findable — a caller with no turn has no
+ * opinion, rather than grading the whole session.
+ */
+export function turnEvidence(transcriptPath: string): Evidence | null {
+  const lines = readLines(transcriptPath);
+  let start = -1;
+  for (let i = lines.length - 1; i >= 0; i--) {
+    if (isUserPrompt(lines[i])) { start = i + 1; break; }
+  }
+  if (start < 0) return null;
+
   const toolUses: Evidence["toolUses"] = [];
   const texts: string[] = [];
-  for (const obj of readLines(transcriptPath)) {
+  for (const obj of lines.slice(start)) {
     for (const b of blocksOf(obj)) {
       if (b["type"] === "tool_use") {
         toolUses.push({ name: String(b["name"] || ""), input: ((b["input"] || {}) as Record<string, unknown>) });
