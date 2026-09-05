@@ -11,8 +11,9 @@ Developer harness repo (DevOS v0.2.0). Own project lives at root: `SKILL.md` (or
 
 ## Conventions (root project)
 
-- Runtime is `bun >= 1.2`; tools are `bun Tools/*.ts`, dry-run by default, `--apply` writes. Never node/npm/tsc.
-- Verify with `bun test tests/` (19 tests, all fixture-isolated in tmp; must stay green). Run it after any `Tools/` or `hooks/` change.
+- Runtime is `bun >= 1.2`; tools are `bun Tools/*.ts`, dry-run by default, `--apply` writes. Never node/npm/npx, and never a build step — the payload ships `.ts` run directly by bun, never compiled output.
+- Typecheck with `bun run typecheck` (`tsc --noEmit`, strict). This rule used to read "never node/npm/**tsc**"; it was narrowed deliberately, so read the reasoning before widening it back. `tsc --noEmit` is static analysis, not a build — it emits nothing and never enters the runtime path. The root `package.json` carries `typescript` + `@types/bun` as devDependencies *only*; `node_modules/` is gitignored and `PAYLOAD` (an explicit allowlist in `Tools/lib.ts`) means none of it can ship into an install. `@types/bun` is not optional: without it tsc cannot resolve `Bun`, `process`, `console`, `node:*`, or `bun:test`, and the check reports 148 errors instead of real ones. `bun.lock` is committed so CI's `--frozen-lockfile` pins the typechecker; an unpinned one lets CI go red with no change here.
+- Verify with `bun test tests/` (52 tests, all fixture-isolated in tmp; must stay green) and `bun run typecheck`. Run both after any `Tools/` or `hooks/` change. CI (`.github/workflows/ci.yml`) runs the same two, both blocking.
 - All writes additive (`existsSync`-guarded copy-missing); permission before mutation; LF line endings.
 - Config is `.toml`, never `.yaml`.
 - Substitution tokens are `{{HARNESS_NAME}}` / `{{HARNESS_VERSION}}` / `{{PROJECT_NAME}}` / `{{OWNER_NAME}}` (identity-only scope — other `{{TOKEN}}` forms in borrowed bodies are legitimate, don't flag).

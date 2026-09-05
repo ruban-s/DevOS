@@ -7,7 +7,7 @@
   <a href="#install"><img src="https://img.shields.io/badge/version-0.2.0-blue?style=flat" alt="Version"></a>
   <a href="#license"><img src="https://img.shields.io/badge/license-MIT-green?style=flat" alt="License"></a>
   <a href="#install"><img src="https://img.shields.io/badge/bun-%3E%3D1.2-black?style=flat&logo=bun" alt="Bun"></a>
-  <a href="#proof"><img src="https://img.shields.io/badge/tests-19_passing-brightgreen?style=flat" alt="Tests"></a>
+  <a href="#proof"><img src="https://img.shields.io/badge/tests-52_passing-brightgreen?style=flat" alt="Tests"></a>
   <a href="#install"><img src="https://img.shields.io/badge/agents-8-orange?style=flat" alt="Agents"></a>
 </p>
 
@@ -49,17 +49,17 @@ No claim closes on "should work". ISC-1 closed on a passing probe; ISC-2 and ISC
 
 ## Install
 
-One script, zero surprises (`install.sh`): bun check first (offers to install it when missing), then a dry-run plan, a prompt, then apply. No sudo, no writes outside the config root, safe to re-run. Full flags and refusal rules: `./install.sh --help`.
+One script, zero surprises (`install.sh`): bun check first (offers to install it when missing), then a dry-run plan, then apply. Run from a terminal it prompts before applying; piped into `bash` there is no TTY to prompt on, so it refuses to apply blind — pass `--yes`, which is where that consent moves. No sudo, no writes outside the config root, safe to re-run. Full flags and refusal rules: `./install.sh --help`.
 
 ```bash
 # From this checkout
 ./install.sh --config-root ~/.claude --apply --wire-claude-md --wire-hooks
 
-# One-liner, release tarball (pinned version, checksum-honoring)
-curl -fsSL https://raw.githubusercontent.com/ruban-s/DevOS/v0.2.0/install.sh | bash -s -- --config-root ~/.claude --apply
+# One-liner, release tarball (pinned version; --yes because a pipe has no TTY to prompt on)
+curl -fsSL https://raw.githubusercontent.com/ruban-s/DevOS/v0.2.0/install.sh | bash -s -- --config-root ~/.claude --apply --yes
 ```
 
-Without `--apply` (the default) nothing is written — the plan is the product until you approve it. Each wiring flag is a separate permission gate: `--wire-claude-md` appends one managed block to `CLAUDE.md`; `--wire-hooks` merges five hook entries into `settings.json` after a timestamped backup (rotation of 5). Changed your mind: delete `DEVOS/` to uninstall; remove the `devos-managed` blocks to unwire.
+Without `--apply` (the default) nothing is written — the plan is the product until you approve it. Applying it always takes a second, explicit yes: the prompt on a terminal, `--yes` when there is no TTY to prompt on. Wiring is gated separately again (see below), and never defaults on.
 
 Prefer the granular tools? They do the same work step by step:
 
@@ -88,8 +88,10 @@ Each wiring flag is a separate permission gate: `--wire-claude-md` appends one m
 
 - Every tool prints JSON; exit `0` = ok (possibly a no-op), `1` = error, `2` = refusal.
 - All install tools refuse the DevOS source checkout as a target (dev-tree rule), and fail loud on an incomplete source tree.
+- Applying needs explicit consent: a TTY prompt, or `--yes` when there is no TTY. Piped into `bash` without `--yes` the installer refuses rather than applying a plan nobody saw.
+- Downloads print the tarball's `sha256`. Pin `DEVOS_EXPECTED_SHA256=<hash>` and the installer compares it and aborts on mismatch before anything is extracted; leave it unset and the hash is reported, not enforced.
 - On machines without Claude, install writes an `AGENTS.md` pointer naming the detected harness and refuses hook wiring — hooks are a Claude Code mechanism; everywhere else the gates run by hand (`bun DEVOS/Tools/ISAGate.ts <isa>`).
-- `bun Tools/Doctor.ts --target <dir>` reports machine + install health: live / broken (with fix command) / declined (silent OFF, never nagged) / stale.
+- `bun Tools/Doctor.ts --target <dir>` reports machine + install health: live / broken (with fix command) / declined (silent OFF, never nagged). Every capability is re-probed on each run, so there is no cached state to go stale.
 
 </details>
 
@@ -110,21 +112,25 @@ Trivial work finishes in seconds on minimal resources; frontier work earns agent
 
 ## Agent matrix
 
-Install scans the machine (binaries + config dirs, no network) and adapts. Hooks fire only where hooks exist; everywhere else the same gates run as explicit commands.
+The global install scans the machine (binaries + config dirs, no network) and adapts. Hooks fire only where hooks exist; everywhere else the same gates run as explicit commands.
 
 | Agent | Install | Always-on hooks | Pointer |
 |---|---|---|---|
-| Claude Code | ✅ full | ✅ 5 gates | `CLAUDE.md` |
-| Codex / Cursor / Copilot / Gemini / Cline / Windsurf / OpenCode | ✅ payload | — (by design, stated at install) | `AGENTS.md` |
+| Claude Code | ✅ full | ✅ 5 gates, with `--wire-hooks` | `CLAUDE.md` |
+| Codex / Cursor / Copilot / Gemini / Cline / Windsurf / OpenCode | ✅ payload | — (by design, refused at install) | `AGENTS.md` |
+
+Two caveats the table can't hold. Wiring is never on by default: the global install writes no pointer without `--wire-claude-md` and no hooks without `--wire-hooks`, and `--wire-hooks` is refused outright on a non-Claude harness. And detection reads the *installing machine's* config dirs, not the target repo — so in the repo-local Setup flow the pointer filename follows whoever ran Setup. On a mixed-harness team, expect both files to show up over time; the block is the same either way, and each is upserted in place.
 
 ## Proof
 
-No performance claims here — instead, runnable proof. Nineteen fixture-isolated tests cover the parser, the gates, the installer contract, and the hook CLIs:
+No performance claims here — instead, runnable proof. Fifty-two fixture-isolated tests cover the ISA parser, the close gates, the repo-local installer contract, the frontier claim protocol, and four of the six hook CLIs:
 
 ```bash
-bun test tests/
-# 19 pass, 0 fail
+bun test tests/     # 52 pass, 0 fail
+bun run typecheck   # tsc --noEmit, strict — no build step, emits nothing
 ```
+
+Stated plainly, because a coverage claim is only worth its gaps: `Tools/GlobalInstall.ts`, `Inference.ts`, `DetectEnv.ts`, `ScanConflicts.ts`, and the `ISAGate` and `StopGates` hooks have no direct tests. The global install path is exercised by hand via `install.sh`.
 
 The suite has already caught real bugs: quoted YAML scalars keeping their quotes, a dry-run path that wrote, a merge check that dropped a hook entry. Every number in this file is reproducible from this repo.
 
