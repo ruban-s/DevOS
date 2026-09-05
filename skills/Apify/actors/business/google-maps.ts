@@ -53,7 +53,8 @@ export interface GoogleMapsPlaceInput {
   scrapeContactInfo?: boolean
 }
 
-export interface GoogleMapsPlace extends BusinessInfo {
+// Google Maps returns opening hours per weekday, not as BusinessInfo's flat string[].
+export interface GoogleMapsPlace extends Omit<BusinessInfo, "openingHours"> {
   placeId: string
   name: string
   url: string

@@ -6,34 +6,27 @@
  */
 
 import { ApifyClient } from 'apify-client'
+import type { ActorRun } from 'apify-client'
 
+// The actors().list() endpoint returns only id/name/username/createdAt/modifiedAt —
+// title, description and stats come back only from actors().get(), so they stay optional.
 export interface Actor {
   id: string
   name: string
   username: string
-  title: string
+  title?: string
   description?: string
-  createdAt?: string
-  modifiedAt?: string
+  createdAt?: Date
+  modifiedAt?: Date
   stats?: {
     totalRuns?: number
-    lastRunStartedAt?: string
+    totalUsers?: number
+    lastRunStartedAt?: Date
   }
 }
 
-export interface ActorRun {
-  id: string
-  actorId: string
-  status: 'READY' | 'RUNNING' | 'SUCCEEDED' | 'FAILED' | 'TIMED-OUT' | 'ABORTED'
-  startedAt: string
-  finishedAt?: string
-  defaultDatasetId: string
-  defaultKeyValueStoreId: string
-  buildNumber?: string
-  exitCode?: number
-  containerUrl?: string
-  output?: any
-}
+// Re-exported, not redeclared: the hand-rolled copy said `actorId` where the API returns `actId`.
+export type { ActorRun }
 
 export interface DatasetOptions {
   offset?: number
@@ -118,7 +111,7 @@ export class Apify {
       build: options?.build
     })
 
-    return run as ActorRun
+    return run
   }
 
   /**
@@ -139,7 +132,8 @@ export class Apify {
    */
   async getRun(runId: string): Promise<ActorRun> {
     const run = await this.client.run(runId).get()
-    return run as ActorRun
+    if (!run) throw new Error(`Apify run not found: ${runId}`)
+    return run
   }
 
   /**
@@ -158,7 +152,7 @@ export class Apify {
     const run = await this.client.run(runId).waitForFinish({
       waitSecs: options?.waitSecs
     })
-    return run as ActorRun
+    return run
   }
 }
 
