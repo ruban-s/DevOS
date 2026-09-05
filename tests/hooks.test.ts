@@ -17,15 +17,17 @@ function tmp(prefix: string): string {
   return d;
 }
 
-async function runHook(file: string, payload: object): Promise<{ out: string; code: number | null }> {
+async function runHook(file: string, payload: object, env?: Record<string, string>): Promise<{ out: string; err: string; code: number | null }> {
   const proc = Bun.spawn(["bun", join(HOOKS, file)], {
     stdin: new TextEncoder().encode(JSON.stringify(payload)),
     stdout: "pipe",
     stderr: "pipe",
+    env: env ? { ...process.env, ...env } : undefined,
   });
   const out = await new Response(proc.stdout).text();
+  const err = await new Response(proc.stderr).text();
   await proc.exited;
-  return { out, code: proc.exitCode };
+  return { out, err, code: proc.exitCode };
 }
 
 // ---------------------------------------------------------------- transcripts
@@ -116,6 +118,134 @@ describe("VerificationGate", () => {
     const d = await grade([userMsg("hi"), say("Here is what I would try next.")]);
     expect(d).toBeNull();
   });
+});
+
+// ----------------------------------------------------- ISAGate shim + StopGates
+
+const BLOCKING_ISA = `---
+phase: complete
+progress: 1/1
+---
+
+## Claims
+- [ ] ISC-1: Thing works.
+
+## Not yet specified
+- fog: leftover — undecided
+`;
+
+const CLEAN_ISA = `---
+phase: complete
+progress: 1/1
+principal_stated_goal: "ship it"
+---
+
+## Claims
+- [x] ISC-1: Anti: nothing regresses.
+
+## Test Strategy
+| claim | type | check | threshold | tool | anchors_to |
+| ISC-1 | bash | probe exits 0 | exit 0 | bash | literal |
+`;
+
+/** An ISA.md fixture; `body: null` makes it a DIRECTORY, which makes gateReport throw. */
+function isaFile(body: string | null): string {
+  const p = join(tmp("devos-hooks-gate-"), "ISA.md");
+  if (body === null) mkdirSync(p, { recursive: true });
+  else writeFileSync(p, body);
+  return p;
+}
+
+const editIsa = (isa: string) => toolUse("Edit", { file_path: isa });
+
+describe("ISAGate CLI shim", () => {
+  const gate = (lines: object[], env?: Record<string, string>) =>
+    runHook("ISAGate.hook.ts", { transcript_path: transcript(lines) }, env);
+
+  test("blocks when an ISA closed this session has hard violations", async () => {
+    const isa = isaFile(BLOCKING_ISA);
+    const r = await gate([userMsg("close it"), editIsa(isa), toolResult(), say("Set to complete.")]);
+    expect(r.code).toBe(0);
+    const d = JSON.parse(r.out) as { decision: string; reason: string };
+    expect(d.decision).toBe("block");
+    expect(d.reason).toContain("PROGRESS_FORMAT");
+    expect(d.reason).toContain("FOG_AT_COMPLETE");
+    expect(d.reason).toContain(isa);
+  }, 20_000);
+
+  test("stays silent on a clean close, and on an ISA nobody edited", async () => {
+    const clean = await gate([userMsg("close it"), editIsa(isaFile(CLEAN_ISA)), toolResult(), say("Closed.")]);
+    expect(clean.code).toBe(0);
+    expect(clean.out.trim()).toBe("");
+
+    const untouched = await gate([userMsg("hi"), toolUse("Read", { file_path: isaFile(BLOCKING_ISA) }), toolResult(), say("Read it.")]);
+    expect(untouched.out.trim()).toBe("");
+  }, 20_000);
+
+  test("ISAGATE_OFF=1 disarms the shim", async () => {
+    const isa = isaFile(BLOCKING_ISA);
+    const lines = [userMsg("close it"), editIsa(isa), toolResult(), say("Set to complete.")];
+    expect((await gate(lines, { ISAGATE_OFF: "1" })).out.trim()).toBe("");
+  }, 20_000);
+
+  test("fails open — an unreadable ISA never breaks the turn", async () => {
+    const r = await gate([userMsg("close it"), editIsa(isaFile(null)), toolResult(), say("Set to complete.")]);
+    expect(r.code).toBe(0);
+    expect(r.out.trim()).toBe("");
+  }, 20_000);
+
+  test("no stdin at all is exit 0, no opinion", async () => {
+    const r = await runHook("ISAGate.hook.ts", {});
+    expect(r.code).toBe(0);
+    expect(r.out.trim()).toBe("");
+  }, 20_000);
+});
+
+describe("StopGates composition", () => {
+  const stop = (lines: object[]) => runHook("StopGates.hook.ts", { transcript_path: transcript(lines) });
+
+  test("first block wins — VerificationGate outranks ISAGate on the same turn", async () => {
+    const isa = isaFile(BLOCKING_ISA);
+    // Edit last turn, bare done-claim this turn: T1 and the ISA gate both fire.
+    const lines = [
+      userMsg("close it"), editIsa(isa), toolResult(), say("Set to complete."),
+      userMsg("are we good?"), say("Yes — it is done."),
+    ];
+    const alone = JSON.parse((await runHook("ISAGate.hook.ts", { transcript_path: transcript(lines) })).out) as { decision: string };
+    expect(alone.decision).toBe("block"); // ISAGate would have blocked this same input
+
+    const d = JSON.parse((await stop(lines)).out) as { decision: string; reason: string };
+    expect(d.decision).toBe("block");
+    expect(d.reason).toContain("VerificationGate T1");
+    expect(d.reason).not.toContain("ISA structural gate");
+  }, 20_000);
+
+  test("ISAGate is reached when VerificationGate has no opinion", async () => {
+    const isa = isaFile(BLOCKING_ISA);
+    const r = await stop([userMsg("close it"), editIsa(isa), toolResult(), say("Set the phase.")]);
+    const d = JSON.parse(r.out) as { decision: string; reason: string };
+    expect(d.decision).toBe("block");
+    expect(d.reason).toContain("ISA structural gate");
+  }, 20_000);
+
+  test("a crashing gate is caught and named, never fatal", async () => {
+    const r = await stop([userMsg("close it"), editIsa(isaFile(null)), toolResult(), say("Set the phase.")]);
+    expect(r.code).toBe(0);
+    expect(r.out.trim()).toBe("");
+    expect(r.err).toContain("[StopGates] ISAGate error:");
+    expect(r.err).not.toContain("[StopGates] fatal:");
+  }, 20_000);
+
+  test("both gates satisfied — nothing emitted", async () => {
+    const r = await stop([
+      userMsg("close it"), editIsa(isaFile(CLEAN_ISA)), toolResult(),
+      toolUse("Bash", { command: "bun test tests/" }), toolResult(),
+      say("Done — the suite is green."),
+    ]);
+    expect(r.code).toBe(0);
+    expect(r.out.trim()).toBe("");
+    expect(r.err.trim()).toBe("");
+  }, 20_000);
 });
 
 // ------------------------------------------------------- checkpoint telemetry
