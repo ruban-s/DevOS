@@ -12,7 +12,7 @@ export class ToolCallVerificationGrader extends BaseGrader {
 
   async grade(context: GraderContext): Promise<GraderResult> {
     const start = performance.now();
-    const params = this.config.params as ToolCallsParams;
+    const params = (this.config.params ?? {}) as ToolCallsParams;
     const toolCalls = context.transcript.tool_calls;
 
     const checks: { check: string; passed: boolean; details?: string }[] = [];

@@ -12,7 +12,7 @@ export class StringMatchGrader extends BaseGrader {
 
   async grade(context: GraderContext): Promise<GraderResult> {
     const start = performance.now();
-    const params = this.config.params as StringMatchParams;
+    const params = (this.config.params ?? {}) as StringMatchParams;
 
     if (!params?.patterns?.length) {
       return this.createResult(0, false, performance.now() - start, {

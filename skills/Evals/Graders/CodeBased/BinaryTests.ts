@@ -13,7 +13,7 @@ export class BinaryTestsGrader extends BaseGrader {
 
   async grade(context: GraderContext): Promise<GraderResult> {
     const start = performance.now();
-    const params = this.config.params as BinaryTestsParams;
+    const params = (this.config.params ?? {}) as BinaryTestsParams;
 
     if (!params?.test_files?.length) {
       return this.createResult(0, false, performance.now() - start, {

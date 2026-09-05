@@ -22,11 +22,19 @@ const DEFAULT_TIMEOUT: Record<InferenceLevel, number> = {
   max: 120_000,
 };
 
+export type ClaudeTier = "haiku" | "sonnet" | "opus";
+
+/** Level → tier. Defaults track the Claude Code aliases; override per level via env. */
+export const EFFORT_TIER: Record<InferenceLevel, ClaudeTier> = {
+  low: "haiku",
+  medium: "sonnet",
+  high: "opus",
+  max: "opus",
+};
+
 function modelFor(level: InferenceLevel): string {
   const env = process.env[`DEVOS_MODEL_${level.toUpperCase()}`];
-  if (env) return env;
-  // Defaults track the Claude Code tier aliases; override per level via env.
-  return { low: "haiku", medium: "sonnet", high: "opus", max: "opus" }[level];
+  return env || EFFORT_TIER[level];
 }
 
 export function normalizeLevel(level: string | undefined): InferenceLevel {

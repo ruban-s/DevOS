@@ -19,18 +19,20 @@
  *      Verified before capping: no eval spec in the tree requested the top rung,
  *      so this removed zero live behavior.
  *
- * Tier→id facts come from `models.ts` (canonical). The cap is this skill's own
- * policy and lives here, not in the registry.
+ * Level→tier facts come from `Tools/Inference.ts` (canonical). The cap is this
+ * skill's own policy and lives here, not in the registry.
  */
 
-import { CURRENT, EFFORT_MODEL, type ClaudeTier, type EffortLevel } from "../../../../DEVOS/Tools/models";
+import { EFFORT_TIER, type ClaudeTier, type InferenceLevel } from "../../../../Tools/Inference.ts";
+
+type EffortLevel = InferenceLevel;
 
 /** Grading never rides the top rung — that door is the Advisor's. */
 const GRADING_CEILING: EffortLevel = "high";
 
-/** Invert EFFORT_MODEL so a resolved tier yields the level that requests it. */
+/** Invert EFFORT_TIER so a resolved tier yields the level that requests it. */
 function levelForTier(tier: ClaudeTier): EffortLevel | undefined {
-  const found = (Object.entries(EFFORT_MODEL) as [EffortLevel, ClaudeTier][])
+  const found = (Object.entries(EFFORT_TIER) as [EffortLevel, ClaudeTier][])
     .find(([, t]) => t === tier);
   return found?.[0];
 }
@@ -47,10 +49,8 @@ export function judgeLevelForModel(judgeModel?: string): EffortLevel {
   if (!judgeModel) return "medium";
   const raw = judgeModel.trim().toLowerCase();
 
-  // Bare alias, or an exact current id.
-  let tier = (Object.keys(CURRENT) as ClaudeTier[]).find(
-    (t) => t === raw || CURRENT[t].toLowerCase() === raw,
-  );
+  // Bare tier alias ("opus").
+  let tier = (Object.values(EFFORT_TIER) as ClaudeTier[]).find((t) => t === raw);
 
   // Any generation of a Claude id: pull the tier out of `claude-<tier>-…`.
   if (!tier) {

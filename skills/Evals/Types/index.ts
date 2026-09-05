@@ -77,8 +77,9 @@ export interface GraderConfig {
   weight?: number;  // Default: 1.0
   required?: boolean;  // If true, task fails if this grader fails
 
-  // Type-specific params
-  params?: Record<string, unknown>;
+  // Type-specific params: an untyped bag from the suite YAML that only the
+  // owning grader knows the shape of, so it asserts rather than the caller.
+  params?: unknown;
 }
 
 // Code-based grader params

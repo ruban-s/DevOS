@@ -14,7 +14,7 @@ export class StateCheckGrader extends BaseGrader {
 
   async grade(context: GraderContext): Promise<GraderResult> {
     const start = performance.now();
-    const params = this.config.params as StateCheckParams;
+    const params = (this.config.params ?? {}) as StateCheckParams;
 
     const checks: { check: string; passed: boolean; expected?: unknown; actual?: unknown }[] = [];
     const workingDir = context.working_dir ?? process.cwd();

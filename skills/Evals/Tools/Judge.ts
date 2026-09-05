@@ -13,7 +13,7 @@
  */
 
 import type { Assertion, AssertResult } from './Assertions.ts';
-import { inference, type InferenceLevel } from '../../../DEVOS/Tools/Inference.ts';
+import { inference, type InferenceLevel } from '../../../Tools/Inference.ts';
 
 export interface JudgeOptions {
   level?: InferenceLevel; // judge level; default 'high' (distinct from a 'medium' agent-under-test)

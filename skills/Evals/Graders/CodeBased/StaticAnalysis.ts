@@ -13,7 +13,7 @@ export class StaticAnalysisGrader extends BaseGrader {
 
   async grade(context: GraderContext): Promise<GraderResult> {
     const start = performance.now();
-    const params = this.config.params as StaticAnalysisParams;
+    const params = (this.config.params ?? {}) as StaticAnalysisParams;
 
     if (!params?.commands?.length) {
       return this.createResult(0, false, performance.now() - start, {

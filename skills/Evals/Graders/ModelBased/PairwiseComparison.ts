@@ -5,7 +5,7 @@
 
 import { BaseGrader, registerGrader, type GraderContext } from '../Base.ts';
 import type { GraderConfig, GraderResult, PairwiseComparisonParams } from '../../Types/index.ts';
-import { inference, type InferenceLevel } from '../../../../DEVOS/Tools/Inference.ts';
+import { inference, type InferenceLevel } from '../../../../Tools/Inference.ts';
 import { judgeLevelForModel } from './JudgeLevel.ts';
 import { readFileSync, existsSync } from 'fs';
 
@@ -71,7 +71,7 @@ export class PairwiseComparisonGrader extends BaseGrader {
 
   async grade(context: GraderContext): Promise<GraderResult> {
     const start = performance.now();
-    const params = this.config.params as PairwiseComparisonParams;
+    const params = (this.config.params ?? {}) as PairwiseComparisonParams;
 
     // Load reference
     let reference = params.reference;

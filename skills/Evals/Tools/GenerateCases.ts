@@ -20,7 +20,7 @@ import { join } from 'node:path';
 import { homedir } from 'node:os';
 import { parseArgs } from 'node:util';
 import { stringify as toYaml } from 'yaml';
-import { inference } from '../../../DEVOS/Tools/Inference.ts';
+import { inference } from '../../../Tools/Inference.ts';
 import type { Assertion } from './Assertions.ts';
 
 const DEVOS_ROOT = process.env.DEVOS_ROOT && existsSync(process.env.DEVOS_ROOT)

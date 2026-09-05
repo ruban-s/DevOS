@@ -25,7 +25,7 @@ import { parse as parseYaml } from 'yaml';
 import { parseArgs } from 'node:util';
 import { evaluateDeterministic, isModelAssert, type Assertion, type AssertResult } from './Assertions.ts';
 import { judgeAssertion } from './Judge.ts';
-import { inference, type InferenceLevel } from '../../../DEVOS/Tools/Inference.ts';
+import { inference, type InferenceLevel } from '../../../Tools/Inference.ts';
 
 const DEVOS_ROOT = process.env.DEVOS_ROOT && existsSync(process.env.DEVOS_ROOT)
   ? process.env.DEVOS_ROOT

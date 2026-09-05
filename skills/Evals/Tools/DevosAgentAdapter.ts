@@ -7,7 +7,7 @@
  * (scenario's UserSimulatorAgent + JudgeAgent still use ai-sdk directly).
  */
 
-import { inference, type InferenceLevel } from '../../../DEVOS/Tools/Inference.ts';
+import { inference, type InferenceLevel } from '../../../Tools/Inference.ts';
 import { AgentAdapter, AgentRole, type AgentInput, type AgentReturnTypes } from '@langwatch/scenario';
 
 export interface DevosAgentAdapterOptions {
