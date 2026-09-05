@@ -9,7 +9,7 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # bun.lock is lockfileVersion 2, which bun 1.2 cannot parse. Runtime floor
       # for users stays bun >= 1.2; only the dev install needs this.
       - uses: oven-sh/setup-bun@v2
