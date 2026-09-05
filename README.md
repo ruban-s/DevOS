@@ -7,8 +7,9 @@
   <a href="#install"><img src="https://img.shields.io/badge/version-0.2.0-blue?style=flat" alt="Version"></a>
   <a href="#license"><img src="https://img.shields.io/badge/license-MIT-green?style=flat" alt="License"></a>
   <a href="#install"><img src="https://img.shields.io/badge/bun-%3E%3D1.2-black?style=flat&logo=bun" alt="Bun"></a>
-  <a href="#proof"><img src="https://img.shields.io/badge/tests-52_passing-brightgreen?style=flat" alt="Tests"></a>
+  <a href="#proof"><img src="https://img.shields.io/badge/tests-87_passing-brightgreen?style=flat" alt="Tests"></a>
   <a href="#install"><img src="https://img.shields.io/badge/agents-8-orange?style=flat" alt="Agents"></a>
+  <a href="#install"><img src="https://img.shields.io/badge/skills-37-purple?style=flat" alt="Skills"></a>
 </p>
 
 <p align="center">
@@ -49,47 +50,60 @@ No claim closes on "should work". ISC-1 closed on a passing probe; ISC-2 and ISC
 
 ## Install
 
-One script, zero surprises (`install.sh`): bun check first (offers to install it when missing), then a dry-run plan, then apply. Run from a terminal it prompts before applying; piped into `bash` there is no TTY to prompt on, so it refuses to apply blind — pass `--yes`, which is where that consent moves. No sudo, no writes outside the config root, safe to re-run. Full flags and refusal rules: `./install.sh --help`.
+Two ways in, depending on how much you want.
+
+### Everything
+
+One script. It checks for `bun` (installs it for you with `--with-bun`), prints the plan, then applies. No sudo, no writes outside the config root, safe to re-run:
 
 ```bash
-# From this checkout
-./install.sh --config-root ~/.claude --apply --wire-claude-md --wire-hooks
-
-# One-liner, release tarball (pinned version; --yes because a pipe has no TTY to prompt on)
-curl -fsSL https://raw.githubusercontent.com/ruban-s/DevOS/v0.2.0/install.sh | bash -s -- --config-root ~/.claude --apply --yes
+curl -fsSL https://raw.githubusercontent.com/ruban-s/DevOS/v0.2.0/install.sh \
+  | bash -s -- --config-root ~/.claude --apply --yes --with-bun
 ```
 
-Without `--apply` (the default) nothing is written — the plan is the product until you approve it. Applying it always takes a second, explicit yes: the prompt on a terminal, `--yes` when there is no TTY to prompt on. Wiring is gated separately again (see below), and never defaults on.
-
-Prefer the granular tools? They do the same work step by step:
-
-**Small — repo-local.** The harness lives in your project at `DEVOS/`, next to the `ISA.md` spec it enforces. Nothing touches your machine config:
+That deploys the payload and nothing else. Wiring is a separate permission gate and never defaults on — add it when you want the pointer block and the hooks:
 
 ```bash
-bun /path/to/DevOS/Tools/DetectEnv.ts --target <repo>      # read-only: OS, harness, target state
-bun /path/to/DevOS/Tools/ScanConflicts.ts --target <repo>  # read-only: what exists, what collides
+curl -fsSL https://raw.githubusercontent.com/ruban-s/DevOS/v0.2.0/install.sh \
+  | bash -s -- --config-root ~/.claude --apply --yes --with-bun --wire-claude-md --wire-hooks
+```
+
+`--wire-claude-md` appends one managed block to `CLAUDE.md`; `--wire-hooks` merges five hook entries into `settings.json` after a timestamped backup (rotation of 5). To uninstall, delete `DEVOS/`; to unwire, delete the `devos-managed` blocks.
+
+Drop `--apply --yes` and you get the plan with nothing written. `--yes` is where consent moves when piped: a pipe has no TTY to prompt on, so without it the script refuses to apply a plan nobody saw. Every flag: `install.sh --help`.
+
+### Just the skills
+
+The 37 skills install standalone into any agent, no script and no `bun`:
+
+```bash
+npx skills add ruban-s/DevOS --full-depth --all           # every skill, every agent
+npx skills add ruban-s/DevOS --full-depth -s Cortex -g    # one skill, user-level
+```
+
+`--full-depth` is required, not optional: the root `SKILL.md` otherwise shadows everything under `skills/` and you silently get 1 skill instead of 38. This route gives you the skills alone — no Algorithm loop, no gates, no ISA workflow.
+
+<details>
+<summary><strong>Details</strong> — manual install, exit codes, refusal rules, non-Claude machines</summary>
+
+Prefer to drive it yourself? The same work, step by step, straight through the CLIs:
+
+```bash
+# Repo-local: lives in your project at DEVOS/, touches no machine config
+bun /path/to/DevOS/Tools/DetectEnv.ts --target <repo>      # read-only
+bun /path/to/DevOS/Tools/ScanConflicts.ts --target <repo>  # read-only
 bun /path/to/DevOS/Tools/DeployCore.ts --target <repo>     # plan — writes nothing
 bun /path/to/DevOS/Tools/DeployCore.ts --target <repo> --apply
 bun /path/to/DevOS/Tools/ActivateImports.ts --target <repo> --apply
-```
 
-**Big — global.** One install serves every repo from your machine config (`~/.claude/DEVOS/`), as a sibling of any predecessor install — which it never touches:
-
-```bash
-bun Tools/GlobalInstall.ts --config-root ~/.claude                 # plan
-bun Tools/GlobalInstall.ts --config-root ~/.claude --apply         # deploy only
+# Global: one install serves every repo, sibling to any predecessor it never touches
 bun Tools/GlobalInstall.ts --config-root ~/.claude --apply --wire-claude-md --wire-hooks
 ```
 
-Each wiring flag is a separate permission gate: `--wire-claude-md` appends one managed pointer block to `CLAUDE.md`; `--wire-hooks` merges five hook entries into `settings.json` after a timestamped backup (rotation of 5). Changed your mind: delete `DEVOS/` to uninstall the payload; remove the `devos-managed` blocks to unwire.
-
-<details>
-<summary><strong>Details</strong> — exit codes, refusal rules, non-Claude machines</summary>
-
 - Every tool prints JSON; exit `0` = ok (possibly a no-op), `1` = error, `2` = refusal.
 - All install tools refuse the DevOS source checkout as a target (dev-tree rule), and fail loud on an incomplete source tree.
-- Applying needs explicit consent: a TTY prompt, or `--yes` when there is no TTY. Piped into `bash` without `--yes` the installer refuses rather than applying a plan nobody saw.
 - Downloads print the tarball's `sha256`. Pin `DEVOS_EXPECTED_SHA256=<hash>` and the installer compares it and aborts on mismatch before anything is extracted; leave it unset and the hash is reported, not enforced.
+- Installing from a fork or a branch: `DEVOS_REPO=owner/repo`, `DEVOS_VERSION=x.y.z`, or `DEVOS_TARBALL_URL=<url>` to bypass tag resolution entirely.
 - On machines without Claude, install writes an `AGENTS.md` pointer naming the detected harness and refuses hook wiring — hooks are a Claude Code mechanism; everywhere else the gates run by hand (`bun DEVOS/Tools/ISAGate.ts <isa>`).
 - `bun Tools/Doctor.ts --target <dir>` reports machine + install health: live / broken (with fix command) / declined (silent OFF, never nagged). Every capability is re-probed on each run, so there is no cached state to go stale.
 
@@ -123,16 +137,16 @@ Two caveats the table can't hold. Wiring is never on by default: the global inst
 
 ## Proof
 
-No performance claims here — instead, runnable proof. Fifty-two fixture-isolated tests cover the ISA parser, the close gates, the repo-local installer contract, the frontier claim protocol, and four of the six hook CLIs:
+No performance claims here — instead, runnable proof. Eighty-seven fixture-isolated tests across six files cover the ISA parser, the close gates, both installer paths, the frontier claim protocol, and all six hook CLIs:
 
 ```bash
-bun test tests/     # 52 pass, 0 fail
+bun test tests/     # 87 pass, 0 fail, 300 expect() calls
 bun run typecheck   # tsc --noEmit, strict — no build step, emits nothing
 ```
 
-Stated plainly, because a coverage claim is only worth its gaps: `Tools/GlobalInstall.ts`, `Inference.ts`, `DetectEnv.ts`, `ScanConflicts.ts`, and the `ISAGate` and `StopGates` hooks have no direct tests. The global install path is exercised by hand via `install.sh`.
+Every file in `Tools/` has direct coverage. Stated plainly, because a coverage claim is only worth its gaps: `install.sh` itself is shell and has no automated test, so its download-and-extract path is exercised by hand. Skills ship their own `package.json` and are typechecked separately in CI, not by `bun test`.
 
-The suite has already caught real bugs: quoted YAML scalars keeping their quotes, a dry-run path that wrote, a merge check that dropped a hook entry. Every number in this file is reproducible from this repo.
+The suite has already caught real bugs: quoted YAML scalars keeping their quotes, a dry-run path that wrote, a merge check that dropped a hook entry, and a packaging bug that copied a skill's `node_modules` into every install. Every number in this file is reproducible from this repo.
 
 ## Layout
 
