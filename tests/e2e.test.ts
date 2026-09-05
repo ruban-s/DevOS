@@ -46,6 +46,14 @@ describe("Setup chain", () => {
     expect(((again.json as { added: string[] }).added)).toHaveLength(0);
   }, 60_000);
 
+  test("a skill's dev install never ships", async () => {
+    const target = repo();
+    await run("DeployCore.ts", ["--target", target, "--apply"]);
+    const leaked = readdirSync(join(target, "DEVOS", "skills"), { withFileTypes: true })
+      .filter((e) => e.isDirectory() && existsSync(join(target, "DEVOS", "skills", e.name, "node_modules")));
+    expect(leaked.map((e) => e.name)).toEqual([]);
+  }, 60_000);
+
   test("source checkout refused without --allow-dev", async () => {
     const r = await run("DeployCore.ts", ["--target", REPO]);
     expect(r.code).toBe(2);

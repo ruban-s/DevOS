@@ -76,6 +76,9 @@ export interface CopyReport { added: string[]; skipped: string[]; dirsMade: stri
 
 interface PairEntry { rel: string; isDir: boolean; exists: boolean; src: string; dest: string }
 
+/** Never deployed: skills carry their own package.json, so a dev install must not ship. */
+const NEVER_COPY = new Set(["node_modules", ".git", ".DS_Store"]);
+
 /**
  * The one src→dest recursive walk (copy, dry-run plan, and install preview all
  * ride on it). `exists` is sampled just before each visit, so a visitor that
@@ -87,7 +90,10 @@ function walkPair(srcRoot: string, destRoot: string, base: string, visit: (e: Pa
     const st = statSync(src);
     if (st.isDirectory()) {
       visit({ rel: relative(base, dest) || ".", isDir: true, exists: existsSync(dest), src, dest });
-      for (const e of readdirSync(src).sort()) walk(join(src, e), join(dest, e));
+      for (const e of readdirSync(src).sort()) {
+        if (NEVER_COPY.has(e)) continue;
+        walk(join(src, e), join(dest, e));
+      }
     } else if (st.isFile()) {
       visit({ rel: relative(base, dest), isDir: false, exists: existsSync(dest), src, dest });
     }
