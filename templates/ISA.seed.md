@@ -1,6 +1,6 @@
 ---
 phase: marking
-progress: 0/0
+progress: 0/2
 task: "{{PROJECT_NAME}} project ISA"
 slug: {{PROJECT_SLUG}}
 started: {{DATE_ISO}}
@@ -49,4 +49,4 @@ ideal_state: "{{IDEAL_STATE_ONE_LINE}}"
 
 ## Decisions
 
-- {{DATE}}: seeded from Spec interview — {{WHY_THIS_SHAPE}}
+- {{DATE_ISO}}: seeded from Spec interview — {{WHY_THIS_SHAPE}}
