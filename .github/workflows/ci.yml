@@ -23,3 +23,24 @@ jobs:
 
       - name: typecheck
         run: bun run typecheck
+
+  skills:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4"
+
+      # Skills ship their own deps and are excluded from the root tsconfig, so
+      # each one that carries a tsconfig is installed and checked in isolation.
+      - name: typecheck skills
+        run: |
+          fail=0
+          while IFS= read -r pkg; do
+            dir=$(dirname "$pkg")
+            if [ ! -f "$dir/tsconfig.json" ]; then echo "skip  $dir (no tsconfig)"; continue; fi
+            echo "check $dir"
+            ( cd "$dir" && bun install --silent && bunx tsc --noEmit ) || fail=1
+          done < <(find skills -name package.json -not -path '*/node_modules/*' | sort)
+          exit $fail
