@@ -1,5 +1,5 @@
-import { describe, test, expect } from "bun:test";
-import { mkdtempSync, writeFileSync, mkdirSync, readFileSync, existsSync } from "node:fs";
+import { describe, test, expect, afterAll } from "bun:test";
+import { mkdtempSync, writeFileSync, mkdirSync, readFileSync, existsSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import {
@@ -7,8 +7,13 @@ import {
   checkHarnessPlaceholders, isDevTreeCheckout, SOURCE_ROOT,
 } from "../Tools/lib";
 
+const made: string[] = [];
+afterAll(() => { for (const d of made) rmSync(d, { recursive: true, force: true }); });
+
 function tmp(): string {
-  return mkdtempSync(join(tmpdir(), "devos-lib-"));
+  const d = mkdtempSync(join(tmpdir(), "devos-lib-"));
+  made.push(d);
+  return d;
 }
 
 describe("copyMissing", () => {

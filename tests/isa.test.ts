@@ -1,8 +1,8 @@
-import { describe, test, expect } from "bun:test";
-import { mkdtempSync, writeFileSync, mkdirSync } from "node:fs";
+import { describe, test, expect, afterAll } from "bun:test";
+import { mkdtempSync, writeFileSync, readFileSync, mkdirSync, realpathSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { readIsa, gateReport, validateEdges, frontier } from "../Tools/isa";
+import { readIsa, gateReport, validateEdges, frontier, sha1 } from "../Tools/isa";
 import { deriveAscent, strip } from "../Tools/ascent";
 
 const GOOD = `---
@@ -29,8 +29,17 @@ Ship it.
 | ISC-3 | bash | diff empty | empty | bash | literal |
 `;
 
+const made: string[] = [];
+afterAll(() => { for (const d of made) rmSync(d, { recursive: true, force: true }); });
+
+function mk(prefix: string): string {
+  const d = mkdtempSync(join(tmpdir(), prefix));
+  made.push(d);
+  return d;
+}
+
 function fixture(name: string, body: string): string {
-  const dir = mkdtempSync(join(tmpdir(), "devos-isa-"));
+  const dir = mk("devos-isa-");
   const p = join(dir, name);
   writeFileSync(p, body);
   return p;
@@ -47,7 +56,7 @@ describe("readIsa", () => {
     expect(isa.claims[1].after).toEqual(["ISC-1"]);
     expect(isa.claims[2].anti).toBe(true);
     expect(isa.tsRows).toHaveLength(3);
-    expect(isa.tsHasAnchorsCol).toBe(true);
+    expect(isa.tsAnchorsCol).toBe(5);
   });
 
   test("counts fog lines, ignores prose checkboxes", () => {
@@ -116,6 +125,50 @@ principal_stated_goal: "goal here"
     expect(r.blocks).toBe(true);
     expect(r.hard[0].code).toBe("ANCHORS_MISSING");
   });
+
+  test("accepts the '| claim |' header the shipped template emits", () => {
+    const p = fixture("ISA.md", `---
+phase: climbing
+progress: 0/1
+principal_stated_goal: "goal here"
+---
+
+## Claims
+- [ ] ISC-1: Thing works.
+
+## Test Strategy
+| claim | type | check | threshold | tool | anchors_to |
+| ISC-1 | bash | probe exits 0 | exit 0 | bash | literal |
+`);
+    expect(readIsa(p).tsRows).toHaveLength(1);
+    const r = gateReport(p);
+    expect(r.blocks).toBe(false);
+    expect(r.hard).toHaveLength(0);
+    expect(r.advisory.map((a) => a.code)).not.toContain("UNCOVERED");
+  });
+
+  test("finds anchors_to in a non-canonical column position", () => {
+    const p = fixture("ISA.md", `---
+phase: climbing
+progress: 0/2
+principal_stated_goal: "goal here"
+---
+
+## Claims
+- [ ] ISC-1: Thing works.
+- [ ] ISC-2: Other thing works.
+
+## Test Strategy
+| isc | anchors_to | type | check | threshold | tool |
+| ISC-1 | literal | bash | probe exits 0 | exit 0 | bash |
+| ISC-2 |  | bash | probe exits 0 | exit 0 | bash |
+`);
+    expect(readIsa(p).tsAnchorsCol).toBe(1);
+    const r = gateReport(p);
+    expect(r.hard.map((h) => h.code)).toEqual(["ANCHORS_MISSING"]);
+    expect(r.hard[0].message).toContain("ISC-2");
+    expect(r.hard[0].message).not.toContain("ISC-1");
+  });
 });
 
 describe("validateEdges", () => {
@@ -150,6 +203,36 @@ describe("frontier", () => {
   });
 });
 
+describe("IsaFrontier claim protocol (CLI)", () => {
+  const TOOL = join(import.meta.dir, "..", "Tools", "IsaFrontier.ts");
+
+  const run = (args: string[]): { code: number; json: any } => {
+    const r = Bun.spawnSync(["bun", TOOL, ...args]);
+    return { code: r.exitCode, json: JSON.parse(r.stdout.toString()) };
+  };
+
+  test("a stale lock is reclaimable by another session", () => {
+    const isaPath = fixture("ISA.md", GOOD);
+    const stateDir = join(mk("devos-state-"), "STATE");
+    const args = ["claim", isaPath, "--id", "ISC-3", "--state-dir", stateDir];
+
+    expect(run([...args, "--session", "session-A"])).toMatchObject({ code: 0, json: { taken: true } });
+
+    const held = run([...args, "--session", "session-B"]);
+    expect(held.code).toBe(2);
+    expect(held.json.reason).toBe("held by session-A");
+
+    const lockFile = join(stateDir, "isa-locks", sha1(realpathSync(isaPath)), "ISC-3.lock");
+    const lock = JSON.parse(readFileSync(lockFile, "utf-8"));
+    writeFileSync(lockFile, JSON.stringify({ ...lock, ts: new Date(Date.now() - 3 * 3600_000).toISOString() }));
+
+    const reclaimed = run([...args, "--session", "session-B"]);
+    expect(reclaimed.code).toBe(0);
+    expect(reclaimed.json).toMatchObject({ taken: true, session: "session-B" });
+    expect(JSON.parse(readFileSync(lockFile, "utf-8")).session).toBe("session-B");
+  });
+});
+
 describe("ascent derivation (single table)", () => {
   test("known phases resolve; legacy stations map; unknown falls back", () => {
     expect(deriveAscent("climbing")).toEqual({ icon: "🧗", label: "Climbing" });
@@ -162,7 +245,7 @@ describe("ascent derivation (single table)", () => {
 describe("findIsas helper surface", () => {
   test("project + work ISAs discovered", async () => {
     const { findIsas } = await import("../Tools/isa");
-    const dir = mkdtempSync(join(tmpdir(), "devos-find-"));
+    const dir = mk("devos-find-");
     writeFileSync(join(dir, "ISA.md"), GOOD);
     mkdirSync(join(dir, "DEVOS", "MEMORY", "WORK", "w1"), { recursive: true });
     writeFileSync(join(dir, "DEVOS", "MEMORY", "WORK", "w1", "ISA.md"), GOOD);

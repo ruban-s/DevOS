@@ -1,22 +1,30 @@
-import { describe, test, expect } from "bun:test";
-import { mkdtempSync, writeFileSync, mkdirSync, readFileSync, existsSync } from "node:fs";
+import { describe, test, expect, afterAll } from "bun:test";
+import { mkdtempSync, writeFileSync, mkdirSync, readFileSync, existsSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 
 // End-to-end through the real CLIs on throwaway fixtures (never the checkout).
 
+const REPO = join(import.meta.dir, "..");
+
 async function run(tool: string, args: string[]): Promise<{ json: unknown; code: number }> {
-  const proc = Bun.spawn(["bun", join("/Users/else/LifeOS/Tools", tool), ...args], {
+  const proc = Bun.spawn(["bun", join(REPO, "Tools", tool), ...args], {
     stdout: "pipe",
     stderr: "pipe",
   });
   const out = await new Response(proc.stdout).text();
   await proc.exited;
-  return { json: JSON.parse(out), code: proc.exitCode };
+  // exitCode is null only when the process died on a signal — surface that, never mask it as 0.
+  return { json: JSON.parse(out), code: proc.exitCode ?? -1 };
 }
 
+const made: string[] = [];
+afterAll(() => { for (const d of made) rmSync(d, { recursive: true, force: true }); });
+
 function repo(): string {
-  return mkdtempSync(join(tmpdir(), "devos-e2e-"));
+  const d = mkdtempSync(join(tmpdir(), "devos-e2e-"));
+  made.push(d);
+  return d;
 }
 
 describe("Setup chain", () => {
@@ -38,9 +46,9 @@ describe("Setup chain", () => {
   }, 60_000);
 
   test("source checkout refused without --allow-dev", async () => {
-    const r = await run("DeployCore.ts", ["--target", "/Users/else/LifeOS"]);
+    const r = await run("DeployCore.ts", ["--target", REPO]);
     expect(r.code).toBe(2);
-    expect(existsSync("/Users/else/LifeOS/DEVOS")).toBe(false);
+    expect(existsSync(join(REPO, "DEVOS"))).toBe(false);
   }, 30_000);
 
   test("SeedSpec seeds once, then refuses", async () => {
@@ -59,8 +67,11 @@ describe("Setup chain", () => {
     const target = repo();
     await run("DeployCore.ts", ["--target", target, "--apply"]);
     const create = await run("ActivateImports.ts", ["--target", target, "--apply"]);
-    expect(((create.json as { mode: string }).mode)).toBe("created");
-    expect(readFileSync(join(target, "AGENTS.md"), "utf-8")).toContain("devos-managed:imports");
+    const c = create.json as { mode: string; pointer: string };
+    expect(c.mode).toBe("created");
+    // Pointer filename follows the detected harness — assert the contract, not this machine's answer.
+    expect(["CLAUDE.md", "AGENTS.md"]).toContain(c.pointer);
+    expect(readFileSync(join(target, c.pointer), "utf-8")).toContain("devos-managed:imports");
     const refresh = await run("ActivateImports.ts", ["--target", target, "--apply"]);
     expect(((refresh.json as { mode: string }).mode)).toBe("refreshed");
   }, 60_000);
