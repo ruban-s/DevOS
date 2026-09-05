@@ -6,7 +6,7 @@
 #   One-liner (release):     curl -fsSL https://raw.githubusercontent.com/ruban-s/DevOS/v0.2.0/install.sh | bash -s -- [flags]
 #
 # Source resolution (in order): --source <dir|tarball> > DEVOS_SOURCE env >
-# local checkout (script sits beside SKILL.md) > release tarball download.
+# local checkout (script sits beside skills/DevOS/SKILL.md) > release tarball.
 # Release default: DEVOS_REPO below — SET THIS to owner/repo on first public
 # release. Until then, download mode requires DEVOS_REPO to be exported.
 #
@@ -117,7 +117,7 @@ BUN_VER="$(bun --version)"
 log "bun $BUN_VER"
 
 # --- source ------------------------------------------------------------
-if [ -z "$SOURCE" ] && [ -f "$SCRIPT_DIR/SKILL.md" ] && [ -f "$SCRIPT_DIR/RUNTIME/VERSION" ]; then
+if [ -z "$SOURCE" ] && [ -f "$SCRIPT_DIR/skills/DevOS/SKILL.md" ] && [ -f "$SCRIPT_DIR/RUNTIME/VERSION" ]; then
   SOURCE="$SCRIPT_DIR"
   log "source: local checkout ($SOURCE)"
 fi
@@ -164,8 +164,8 @@ else
   esac
 fi
 
-[ -f "$SOURCE/SKILL.md" ] && [ -f "$SOURCE/RUNTIME/VERSION" ] \
-  || die "source at $SOURCE is not a DevOS checkout (SKILL.md + RUNTIME/VERSION missing)."
+[ -f "$SOURCE/skills/DevOS/SKILL.md" ] && [ -f "$SOURCE/RUNTIME/VERSION" ] \
+  || die "source at $SOURCE is not a DevOS checkout (skills/DevOS/SKILL.md + RUNTIME/VERSION missing)."
 log "dist version: $(cat "$SOURCE/RUNTIME/VERSION")"
 
 # --- plan --------------------------------------------------------------

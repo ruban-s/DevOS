@@ -16,7 +16,9 @@ export const HARNESS_NAME = "DevOS";
 
 /** Payload entries copied by DeployCore: [sourceRel, destRel-under-DEVOS]. */
 export const PAYLOAD: Array<[string, string]> = [
-  ["SKILL.md", "SKILL.md"],
+  // Orchestrator lives under skills/ so `npx skills add` discovers the whole set:
+  // a repo-root SKILL.md shadows every nested one. Deployed layout is unchanged.
+  ["skills/DevOS/SKILL.md", "SKILL.md"],
   ["RUNTIME", "RUNTIME"],
   ["Tools", "Tools"],
   ["Workflows", "Workflows"],

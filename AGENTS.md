@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Developer harness repo (DevOS v0.2.0). Own project lives at root: `SKILL.md` (orchestrator), `Workflows/`, `Tools/`, `RUNTIME/`, `skills/`, `hooks/`, `templates/`, `tests/`. `temp/reference/` is a frozen predecessor snapshot for reading only (gitignored).
+Developer harness repo (DevOS v0.2.0). Own project lives at root: `skills/DevOS/SKILL.md` (orchestrator, deploys to `DEVOS/SKILL.md`), `Workflows/`, `Tools/`, `RUNTIME/`, `skills/`, `hooks/`, `templates/`, `tests/`. `temp/reference/` is a frozen predecessor snapshot for reading only (gitignored).
 
 ## Boundary
 
