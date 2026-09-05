@@ -2,17 +2,6 @@
 
 Read back completed eval runs: list them, open the latest summary, drill into trials and grader detail, check saturation.
 
-## Voice notification
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the ViewResults workflow in the Evals skill to display eval results"}' \
-  > /dev/null 2>&1 &
-```
-
-Running the **ViewResults** workflow in the **Evals** skill to display eval results...
-
 ---
 
 ## Where results live

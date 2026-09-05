@@ -15,20 +15,12 @@ Read back the live state of the horizon set.
 
 ## The Pass
 
-### Ping 1: Announce
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Checking current world model state"}'
-```
-
-### Move 2: Open the Index
+### Move 1: Open the Index
 
 Read `DEVOS/MEMORY/RESEARCH/WorldModels/INDEX.md`.
 Absent: "No horizon reads on disk. Run 'update world models' to seed them."
 
-### Move 3: Choose the Aperture
+### Move 2: Choose the Aperture
 
 **Survey** (stock — no window named):
 - Show the INDEX grid with windows, dates, versions, confidence
@@ -42,7 +34,7 @@ Absent: "No horizon reads on disk. Run 'update world models' to seed them."
 - Set key motifs from chosen windows side by side
 - Call out where short-arc and long-arc trends pull apart
 
-### Move 4: Freshness Grades
+### Move 3: Freshness Grades
 
 Per read, compare `last_updated` against today:
 - **Under 7 days**: 🟢 Fresh
@@ -50,7 +42,7 @@ Per read, compare `last_updated` against today:
 - **30–90 days**: 🟠 Aging — refresh advised
 - **Over 90 days**: 🔴 Stale — refresh strongly advised
 
-### Move 5: Emit
+### Move 4: Emit
 
 ```markdown
 # 🌍 World Threat Model Status

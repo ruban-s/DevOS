@@ -15,23 +15,6 @@ Predictable read and write for tldraw canvases. A `.tldr` file is plain JSON (`{
 
 When present, honor any PREFERENCES.md inside (stock canvas folder, favored colors and register, preferred opening surface). Otherwise proceed on defaults.
 
-## Voice Notification
-
-**On every run, do BOTH:**
-
-1. **Spoken ping**:
-   ```bash
-   curl -s -X POST http://localhost:31337/notify \
-     -H "Content-Type: application/json" \
-     -d '{"message": "Running WORKFLOWNAME in Tldraw"}' \
-     > /dev/null 2>&1 &
-   ```
-
-2. **Printed line**:
-   ```
-   Running **WorkflowName** in **Tldraw**...
-   ```
-
 ## Pick Your Path
 
 | Path | Fits when | Doc |

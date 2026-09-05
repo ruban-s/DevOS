@@ -2,17 +2,6 @@
 
 Lift an existing skill on the back of test evidence, operator notes, or quality worries. This is the revision half of the test–iterate loop.
 
-## Voice Notification
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the ImproveSkill workflow in the CreateSkill skill to improve skill quality"}' \
-  > /dev/null 2>&1 &
-```
-
-Running the **ImproveSkill** workflow in the **CreateSkill** skill to improve skill quality...
-
 ---
 
 ## 1. Pull the evidence together

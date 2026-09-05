@@ -36,15 +36,7 @@ Anything absent: "Horizon reads incomplete. Run 'update world models' first."
 Reads older than 30 days: warn, then continue.
 ```
 
-### Ping 1: Announce
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Testing your idea against all eleven world threat models at TIER tier"}'
-```
-
-### Move 2: State and Split the Idea
+### Move 1: State and Split the Idea
 
 Before the horizons touch it, pin the idea down:
 
@@ -57,7 +49,7 @@ For **Standard and Deep gears:** bring FirstPrinciples to sort the bets:
 - Soft limits (policy, rules, norms)
 - Guesses (untested beliefs the idea stands on)
 
-### Move 3: Run the Horizons
+### Move 2: Run the Horizons
 
 Read the 11 horizon files from `DEVOS/MEMORY/RESEARCH/WorldModels/`.
 
@@ -94,21 +86,13 @@ Full bench:
 6. Fuse everything
 7. Emit the complete form from OutputFormat.md (all blocks)
 
-### Move 4: Shape the Answer
+### Move 3: Shape the Answer
 
 Follow the `OutputFormat.md` skeleton at the skill root. Keep:
 - Every horizon fenced under its own header
 - Verdict glyphs applied consistently
 - Confidence as read-confidence times analysis-certainty
 - Hostile findings tied to their window's weather
-
-### Ping 5: Closing Note
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Analysis complete. SUMMARY_OF_EXECUTIVE_VERDICT"}'
-```
 
 ## Answer Shape
 

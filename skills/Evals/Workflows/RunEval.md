@@ -2,17 +2,6 @@
 
 Execute an eval suite end to end: validate it exists, run it through `EvalRunner`, collect the persisted results, report the summary.
 
-## Voice notification
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the RunEval workflow in the Evals skill to execute evaluation"}' \
-  > /dev/null 2>&1 &
-```
-
-Running the **RunEval** workflow in the **Evals** skill to execute evaluation...
-
 ---
 
 ## Prerequisites

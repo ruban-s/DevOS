@@ -87,7 +87,7 @@ Suites bound to a particular operator identity (personal dispositions and the li
 
 ## Harness wiring
 
-- **Config-change regression:** `hooks/ConfigEvalFire.hook.ts` → `DEVOS/Tools/ConfigEvalOnChange.ts` fires the configured dispositions suite when a behaviour-defining file changes (default `core-dispositions`, the runnable v2 suite; override with `config_change_suite` in `DEVOS/PROFILE/CUSTOMIZATIONS/SKILLS/Evals/config.json` — identity-bound suites live in that user layer, never in the shared tree). Non-blocking, subscription-billed, debounced; regressions surface as notifications.
+- **Config-change regression:** `Suites/Regression/core-dispositions.yaml` is the runnable v2 suite for behaviour-defining changes. No hook fires it automatically — run it through `RunEval.md` after editing config, skills, or the system prompt. Identity-bound suites live in `DEVOS/PROFILE/CUSTOMIZATIONS/SKILLS/Evals/Suites/`, never in the shared tree.
 - **ISA bridge:** a suite is the executable form of an ISA claim's falsifier (the integration map lives with the maintainer — session notes, not shipped).
 
 ## What v1 left behind

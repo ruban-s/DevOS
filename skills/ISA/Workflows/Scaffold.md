@@ -25,24 +25,15 @@ Draft a fresh ISA from a prompt. The product is a populated file at the canonica
 
 ## Procedure
 
-### 1 — Announce
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the Scaffold workflow in the ISA skill"}' \
-  > /dev/null 2>&1 &
-```
-
-### 2 — Read an example first
+### 1 — Read an example first
 
 Open `DEVOS/skills/ISA/Examples/canonical-isa.md` for headers and tone. The minimal floor is `e1-minimal.md`; the deepest shape is `e5-enterprise.md`. (`eN-` prefixes are retired tier vocabulary kept as filenames; legacy frontmatter or headings in examples never override the current SKILL.md shape.)
 
-### 3 — Preserve the stated goal before deriving anything
+### 2 — Preserve the stated goal before deriving anything
 
 Populate `principal_stated_goal` (frontmatter) AND the first quoted sentence of `## Goal` from the same byte-for-byte literal BEFORE writing any derived section. Derivation — Out of Scope, Constraints, Principles, distilled Goal prose, claims — comes second, anchored to the preserved literal through the `anchors_to` column. Preserve first, derive second.
 
-#### 3a — Detect the literal
+#### 2a — Detect the literal
 
 Four signals, run over the prompt:
 
@@ -68,11 +59,11 @@ principal_stated_goal_locked: <ISO-8601>
 
 Copy the verbatim quote into `## Goal` as the first sentence, in quotes, ahead of any derived prose.
 
-#### 3b — Derive the residue
+#### 2b — Derive the residue
 
 Distill what remains: explicit wants beyond the literal (→ Vision + derived Goal prose); explicit not-wants (→ Out of Scope); implied not-wants from domain context (→ Out of Scope); domain-implied mandates (→ Constraints); standing truths the principal's past work shows they hold (→ Principles).
 
-### 4 — Ambiguity check: could I be wrong about what done means?
+### 3 — Ambiguity check: could I be wrong about what done means?
 
 One rule. If the goal supports ≥2 interpretations leading to materially different builds, or required content can't be drafted without speculation → ask up to 3 targeted questions on substantial work; on trivial fast-path work prepend the flag instead: `⚠️ Picking X over Y because R; redirect if wrong.` A literal whole-response `proceed` accepts reasoned defaults.
 
@@ -109,7 +100,7 @@ Draw questions from the thinnest sections: Vision/Goal → what the user feels a
 
 **Re-check later:** information arriving after scaffold that would have changed Goal, Vision, or Out of Scope (a premortem result, a mid-build discovery) → re-run the one rule and log a Decisions row naming the shift. Never blocks a phase transition.
 
-### 5 — Frontmatter
+### 4 — Frontmatter
 
 ```yaml
 ---
@@ -129,7 +120,7 @@ interview_invoked: false
 ---
 ```
 
-### 6 — Sections the substance calls for
+### 5 — Sections the substance calls for
 
 | Substance | Owes |
 |---|---|
@@ -154,11 +145,11 @@ Project-ISA override: a `<project>/ISA.md` target always owes full substantial-g
 
 **No changelog section, ever.** The scaffold never emits one — `git log -- <isa-path>` is the change record. The conjecture/refuted-by/learned/criterion-now trail lives in `## Learning`, written at close and only when understanding changed. A closed claim's `## Verification` entry is a **one-line provenance stub** (commit hash, test name, probe ref) — proof lives in git and CI; the ISA points.
 
-### 7 — Hold fog as fog
+### 6 — Hold fog as fog
 
 A surface named in Vision/Goal whose shape is genuinely unknown at scaffold gets no speculative claims. Each such question goes to `## Not yet specified` in its sharpest statable form: `- fog: <question> — <what must resolve before it sharpens>`. Graduation test: statable-with-falsifier → a claim (even a blocked one); statable-but-not-probe-able → fog; beyond the vision → Out of Scope. The gate judges coverage at close — `phase: complete` requires fog empty (every entry graduated or killed via Decisions). Omit the section when there is no fog.
 
-### 8 — Splitting Test on every claim
+### 7 — Splitting Test on every claim
 
 One binary tool probe per claim:
 
@@ -171,11 +162,11 @@ One binary tool probe per claim:
 | A shared symbol changes — enumerate consumers, one probe each |
 | No probe is nameable — not atomic yet |
 
-### 9 — Anti-claims, then antecedents
+### 8 — Anti-claims, then antecedents
 
 Ask what must NOT happen — at least one anti-claim, typically derived from Out of Scope plus regression concerns. Then: an experiential goal (art, design, content — anything that has to "land") earns at least one `Antecedent:` claim naming a precondition that reliably produces the target experience. Verifiable goals don't need antecedents.
 
-### 10 — Gate, then return the path
+### 9 — Gate, then return the path
 
 Invoke `Workflows/CheckCompleteness.md` against the new ISA (substantial and up; a trivial minimal ISA logs its shape check inline). Fill any missing required section before declaring the scaffold done. Output the absolute path of the created file.
 

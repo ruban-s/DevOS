@@ -38,20 +38,11 @@ review_required: true
 
 ## Procedure
 
-### 1 — Voice notification
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the Seed workflow in the ISA skill"}' \
-  > /dev/null 2>&1 &
-```
-
-### 2 — Refuse when an ISA exists
+### 1 — Refuse when an ISA exists
 
 `<project_path>/ISA.md` present → abort with `status: exists`. Seed never overwrites — deepen via Interview or extend via Scaffold instead.
 
-### 3 — Inventory the repo, in this order
+### 2 — Inventory the repo, in this order
 
 1. `README.md` — primary signal for Vision, Goal, sometimes Problem
 2. `package.json` — name, description, dependencies (→ Constraints: runtime, frameworks)
@@ -60,7 +51,7 @@ curl -s -X POST http://localhost:31337/notify \
 5. Pre-existing PRD-shaped artifacts — `PRD.md`, `SPEC.md`, `SPECS.md`, `acceptance.yaml`, `requirements.md` (source material; cite in Decisions)
 6. Top-level directory layout (→ Features: `auth/`, `ui/`, `api/` suggest units)
 
-### 4 — Draft from sources
+### 3 — Draft from sources
 
 - **Problem:** lift the README's Why/Motivation when present; otherwise infer one tight answer to "what does this repo solve that wasn't solved?" Keep 1–3 sentences.
 - **Vision:** lift the headline pitch plus any "what it feels like" prose. Dry README → stub with `<!-- TODO: author Vision — what does delight look like for this project? -->`.
@@ -72,7 +63,7 @@ curl -s -X POST http://localhost:31337/notify \
 - **Features:** one per top-level source dir, cross-checked against commit messages for what's active. Claims keep global stable IDs.
 - **Skip** Principles, Decisions, Learning, Verification — author-owned. Empty sections never appear. Close with a Decisions TODO: seed-generated draft; run `Skill('ISA', 'interview me on <path>')` for Principles, Vision/Goal refinement, and claim audit.
 
-### 5 — Write and flag for review
+### 4 — Write and flag for review
 
 Frontmatter:
 

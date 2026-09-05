@@ -1,18 +1,5 @@
 # ReplayFlow Workflow
 
-## Voice Notification
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the ReplayFlow workflow in the Interceptor skill to replay a recorded flow"}' \
-  > /dev/null 2>&1 &
-```
-
-Running **ReplayFlow** in **Interceptor**...
-
----
-
 Re-drive a bottled user journey to prove it holds past a deploy or edit. Each plan move executes in order, each stage's outcome is captured, regressions get named.
 
 ## Isolation preflight (MANDATORY opener)

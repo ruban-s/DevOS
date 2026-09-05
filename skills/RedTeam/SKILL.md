@@ -11,25 +11,6 @@ description: "Adversarial review that sends parallel expert critics after an ide
 
 When that folder exists, honor any PREFERENCES.md, configs, or extra material inside it. Those settings win over the defaults below. When it is absent, carry on with the standard behavior.
 
-## 🚨 MANDATORY: Voice Notification (REQUIRED BEFORE ANY ACTION)
-
-**Send this announcement BEFORE any other step once the skill fires.**
-
-1. **Spoken ping**:
-   ```bash
-   curl -s -X POST http://localhost:31337/notify \
-     -H "Content-Type: application/json" \
-     -d '{"message": "Running the WORKFLOWNAME workflow in the RedTeam skill to ACTION"}' \
-     > /dev/null 2>&1 &
-   ```
-
-2. **Printed line**:
-   ```
-   Running the **WorkflowName** workflow in the **RedTeam** skill to ACTION...
-   ```
-
-**No skipping. Fire the curl the moment the skill engages.**
-
 # RedTeam Skill
 
 ## Why This Exists

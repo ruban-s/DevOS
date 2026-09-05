@@ -8,23 +8,6 @@ description: Turns the session's finished output (analysis, research, red team, 
 
 Publishes whatever the session just produced — analysis, research, red team, report, plan — as a single self-contained, designed HTML file. The division of labor never varies: the model distills the session output into a typed content JSON and selects a design register; `Tools/Render.ts` owns every layout, typography, and color decision from there. The design authority lives in the tool precisely so two runs over similar content converge on craft instead of whim.
 
-## Voice Notification
-
-**When executing a workflow, do BOTH:**
-
-1. **Send voice notification**:
-   ```bash
-   curl -s -X POST http://localhost:31337/notify \
-     -H "Content-Type: application/json" \
-     -d '{"message": "Running the Render workflow in the HTML skill to build a designed HTML artifact"}' \
-     > /dev/null 2>&1 &
-   ```
-
-2. **Output text notification**:
-   ```
-   Running **Render** in **HTML**...
-   ```
-
 ## Workflow Routing
 
 | Workflow | Trigger | File |

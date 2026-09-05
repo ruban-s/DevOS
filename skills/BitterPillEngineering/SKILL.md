@@ -11,23 +11,6 @@ description: "Trims bloated AI instruction sets through the smarter-model test â
 
 When that folder exists, read any PREFERENCES.md or config files inside and let them take precedence over the defaults below. When it is absent, continue with the built-in behavior.
 
-## Voice Notification
-
-**On every workflow run, emit both signals:**
-
-1. **Spoken notice**:
-   ```bash
-   curl -s -X POST http://localhost:31337/notify \
-     -H "Content-Type: application/json" \
-     -d '{"message": "Running the WORKFLOWNAME workflow in the BitterPillEngineering skill to ACTION"}' \
-     > /dev/null 2>&1 &
-   ```
-
-2. **Printed notice**:
-   ```
-   Running the **WorkflowName** workflow in the **BitterPillEngineering** skill to ACTION...
-   ```
-
 # BitterPillEngineering
 
 ## Purpose

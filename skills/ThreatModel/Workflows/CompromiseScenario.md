@@ -2,15 +2,6 @@
 
 Answer "what breaks if asset X falls" against real reach data, then land the findings as ledger risks.
 
-## Announce
-
-```bash
-curl -s -X POST http://localhost:31337/notify -H "Content-Type: application/json" \
-  -d '{"message": "Running CompromiseScenario in ThreatModel"}' > /dev/null 2>&1 &
-```
-
-Running **CompromiseScenario** in **ThreatModel**...
-
 ## Gate Zero — target
 
 One concrete asset is required (inventory key, app, domain, worker). When none is given and none can be inferred, ask which asset. Otherwise continue.

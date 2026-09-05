@@ -5,14 +5,6 @@ description: "Design and integrate web interfaces along three paths: DirectDesig
 license: Complete terms in LICENSE.txt
 ---
 
-## Voice Notification (REQUIRED FIRST ACTION)
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the Webdesign skill", "voice_enabled": true}' > /dev/null
-```
-
 ## What It Does
 
 Three routes to finished web UI, one skill. **DirectDesign** has the assistant write the design inline, steered by Anthropic's open-source frontend-design philosophy loaded from a local mirror. **NativeDesignSync** drives Anthropic's first-party `/design` and `/design-sync` Claude Code commands. **ClaudeDesign** drives the `claude.ai/design` web product through the Interceptor skill and folds the result back into the codebase. Default routing: quick in-codebase work → DirectDesign; code-bound integration and design-system sync → the native CLI; explicit web-canvas review → ClaudeDesign.

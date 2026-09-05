@@ -2,15 +2,6 @@
 
 **The default Ideate workflow.** One evolutionary run end to end: CONSUME → DREAM → DAYDREAM → CONTEMPLATE → STEAL → MATE → TEST → EVOLVE → META-LEARN per cycle, with the Loop Controller ruling continue / pivot / stop at every cycle boundary.
 
-## Voice Notification
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the FullCycle workflow in the Ideate skill to evolve novel solutions"}' \
-  > /dev/null 2>&1 &
-```
-
 ## Inputs
 
 - **Problem statement** (required): the question or challenge to ideate against

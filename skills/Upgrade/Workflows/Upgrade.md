@@ -1,16 +1,5 @@
 # Upgrade Workflow
 
-## Voice Notification
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the Upgrade workflow in the Upgrade skill to check for upgrades"}' \
-  > /dev/null 2>&1 &
-```
-
-Running the **Upgrade** workflow in the **Upgrade** skill to check for upgrades...
-
 **Trigger:** "check for upgrades", "upgrade", "any updates", "check Anthropic", "check YouTube"
 
 ---

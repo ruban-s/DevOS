@@ -14,25 +14,6 @@ background: false
 When present, honor any `PREFERENCES.md`, configs, or extra material inside. Those settings win over the defaults. When absent, proceed on standard behavior.
 
 
-## MANDATORY: Voice Notification (REQUIRED BEFORE ANY ACTION)
-
-**Send this announcement BEFORE any other step once the skill fires.**
-
-1. **Spoken ping:**
-   ```bash
-   curl -s -X POST http://localhost:31337/notify \
-     -H "Content-Type: application/json" \
-     -d '{"message": "Running the WORKFLOWNAME workflow in the RootCauseAnalysis skill to ACTION"}' \
-     > /dev/null 2>&1 &
-   ```
-
-2. **Printed line:**
-   ```
-   Running the **WorkflowName** workflow in the **RootCauseAnalysis** skill to ACTION...
-   ```
-
-**No skipping. Fire the curl the moment the skill engages.**
-
 ---
 
 # RootCauseAnalysis Skill

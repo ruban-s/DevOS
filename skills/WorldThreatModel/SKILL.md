@@ -83,19 +83,6 @@ This rig conducts several DevOS muscles:
 - **Council** — multi-voice argument over viability across horizons
 - **Research** — fresh evidence when building or refreshing reads
 
-## Announce
-
-Ahead of any path:
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the WORKFLOWNAME workflow in the WorldThreatModel skill to ACTION"}' \
-  > /dev/null 2>&1 &
-```
-
-Then print: `Running the **WorkflowName** workflow in the **WorldThreatModel** skill to ACTION...`
-
 ## Tailoring Check
 
 Before running, look for operator overrides at:

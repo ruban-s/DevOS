@@ -2,17 +2,6 @@
 
 Draw a diagram as a `.tldr` canvas in the hand-drawn tldraw register — the sketchy counterpart to polished generated art.
 
-## Announce
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running SketchDiagram in Tldraw"}' \
-  > /dev/null 2>&1 &
-```
-
-Running **SketchDiagram** in **Tldraw**...
-
 ## Gate Zero — brief
 
 Before placing anything, settle: what the diagram must say, roughly how many pieces, and where the file belongs (stock: a `Canvases/` folder per operator taste, else the live project). When a reading fork would reshape the drawing, flag it in one line (`⚠️ Picking X over Y because R; redirect if wrong.`) and continue on the best default.

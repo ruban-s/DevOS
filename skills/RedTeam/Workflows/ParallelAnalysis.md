@@ -1,16 +1,5 @@
 # ParallelAnalysis — RedTeam
 
-## Announce
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the ParallelAnalysis workflow in the RedTeam skill to red team arguments"}' \
-  > /dev/null 2>&1 &
-```
-
-Running the **ParallelAnalysis** workflow in the **RedTeam** skill to red team arguments...
-
 ## What Leaves the Room
 
 One position, attacked from every side at once, resolved into the pair that matters:

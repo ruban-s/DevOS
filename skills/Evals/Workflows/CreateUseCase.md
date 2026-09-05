@@ -2,17 +2,6 @@
 
 Build a new eval suite from scratch: requirements, directory, suite file, versioned prompts, cases, golden references, docs, validation, first run.
 
-## Voice notification
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the CreateUseCase workflow in the Evals skill to create eval use case"}' \
-  > /dev/null 2>&1 &
-```
-
-Running the **CreateUseCase** workflow in the **Evals** skill to create eval use case...
-
 ---
 
 ## Prerequisites

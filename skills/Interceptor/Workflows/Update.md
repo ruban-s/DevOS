@@ -1,18 +1,5 @@
 # Update Workflow
 
-## Voice Notification
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the Update workflow in the Interceptor skill to rebuild interceptor"}' \
-  > /dev/null 2>&1 &
-```
-
-Running **Update** in **Interceptor**...
-
----
-
 Rebuild interceptor from latest source and verify the full pipeline. Defaults to **full Computer Use** install (CLI + daemon + Chrome extension + macOS bridge); pass `--browser-only` mode where noted to skip the bridge.
 
 ## When to Use

@@ -1,16 +1,5 @@
 # AdversarialValidation — RedTeam
 
-## Announce
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the AdversarialValidation workflow in the RedTeam skill to validate decisions"}' \
-  > /dev/null 2>&1 &
-```
-
-Running the **AdversarialValidation** workflow in the **RedTeam** skill to validate decisions...
-
 **Job:** let rival drafts fight under a harsh judge so the fused answer comes out stronger than any single entry.
 
 **Fits:**

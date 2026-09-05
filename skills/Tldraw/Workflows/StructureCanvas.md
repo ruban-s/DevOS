@@ -2,17 +2,6 @@
 
 Take a human's scattered board — loose notes, boxes, fragments — and write back the organized twin: grouped, framed, linked, nothing dropped.
 
-## Announce
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running StructureCanvas in Tldraw"}' \
-  > /dev/null 2>&1 &
-```
-
-Running **StructureCanvas** in **Tldraw**...
-
 ## Gate Zero — target
 
 Pin the file path and whether the SAME file should change (stock) or a tidy copy should sit beside it. When their editor holds the canvas open, ask for a close or warn of a reopen (SKILL.md Traps — in-memory editors).

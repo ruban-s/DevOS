@@ -11,26 +11,6 @@ description: "Owns every DevOS skill job end to end — scaffold a skill, edit o
 
 When that folder exists, read any PREFERENCES.md or config files inside and let them take precedence over the defaults below. When it is absent, continue with the built-in behavior.
 
-
-## 🚨 MANDATORY: Voice Notification (REQUIRED BEFORE ANY ACTION)
-
-**Send this notice BEFORE anything else once this skill is invoked.**
-
-1. **Spoken notice**:
-   ```bash
-   curl -s -X POST http://localhost:31337/notify \
-     -H "Content-Type: application/json" \
-     -d '{"message": "Running the WORKFLOWNAME workflow in the CreateSkill skill to ACTION"}' \
-     > /dev/null 2>&1 &
-   ```
-
-2. **Printed notice**:
-   ```
-   Running the **WorkflowName** workflow in the **CreateSkill** skill to ACTION...
-   ```
-
-**Not optional. Fire this curl the moment the skill engages.**
-
 # CreateSkill
 
 One orchestrator owns another skill's entire life. The **shape half** — scaffold, validate, canonicalize — holds skills inside DevOS conventions. The **performance half** — test, improve, tune triggers — draws on Anthropic's skill-creator practice and proves a skill actually works and fires when it should. Writing skill files by hand, outside this orchestrator, is the forbidden path.
@@ -180,7 +160,7 @@ Tune a public skill per operator at run time with `DEVOS/PROFILE/CUSTOMIZATIONS/
 
 - Generic `~/` paths (`DEVOS/skills/`, `~/Projects/<tool>/`) — resolved per user
 - Public repo URLs for depended-on tools
-- Public API endpoints that are convention, not secret (e.g., `localhost:31337/notify`)
+- Public API endpoints that are convention, not secret (e.g., `http://localhost:3000` for a local dev server)
 - Sample values flagged as placeholders (`<url>`, `<SESSION_ID>`, `test@example.com`)
 - Generic env var *names*, never values: `STRIPE_API_KEY`, `OPENAI_API_KEY`
 

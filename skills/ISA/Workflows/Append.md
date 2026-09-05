@@ -48,20 +48,11 @@ Inputs: `isc_id` (must exist in the claims), `probe_type`, `provenance` (one lin
 
 ## Procedure
 
-### 1 — Voice notification
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the Append workflow in the ISA skill"}' \
-  > /dev/null 2>&1 &
-```
-
-### 2 — Resolve target and section
+### 1 — Resolve target and section
 
 Read `isa_path`. Find `## Decisions` | `## Learning` | `## Verification`; create a missing one in canonical position (Decisions after Features, Learning after Decisions, Verification last). Never create a changelog section.
 
-### 3 — Validate shape
+### 2 — Validate shape
 
 | Type | Owes | Refuse when… |
 |---|---|---|
@@ -71,7 +62,7 @@ Read `isa_path`. Find `## Decisions` | `## Learning` | `## Verification`; create
 
 Refusal writes nothing — silent partials are exactly what this workflow exists to prevent.
 
-### 4 — Format, 5 — append, 6 — progress, 7 — return
+### 3 — Format, 4 — append, 5 — progress, 6 — return
 
 Format per the schemas verbatim (Learning in the four-line indented form; Verification exactly one line). Append to the section end, preserving prior entries; bump frontmatter `updated:`. When a Verification entry closes a previously-open claim, flip it to `[x]` in the claims and recompute `progress: M/N`. Return the appended text plus the path.
 

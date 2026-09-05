@@ -2,17 +2,6 @@
 
 **Purpose**: Interrogate every stated assumption and constraint, sorting each into hard constraint (physics), soft constraint (choice), or untested assumption.
 
-## Voice Notification
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the Challenge workflow in the FirstPrinciples skill to test assumptions"}' \
-  > /dev/null 2>&1 &
-```
-
-Running the **Challenge** workflow in the **FirstPrinciples** skill to test assumptions...
-
 ---
 
 **When to Use**:

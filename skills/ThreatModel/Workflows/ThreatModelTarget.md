@@ -2,15 +2,6 @@
 
 Model one target end to end — an app, a service, a data flow, or the full estate.
 
-## Announce
-
-```bash
-curl -s -X POST http://localhost:31337/notify -H "Content-Type: application/json" \
-  -d '{"message": "Running ThreatModelTarget in ThreatModel"}' > /dev/null 2>&1 &
-```
-
-Running **ThreatModelTarget** in **ThreatModel**...
-
 ## Gate Zero — boundary
 
 The target plus its trust edge is required. A wide target ("the whole estate") is legitimate — the pass becomes a portfolio sweep over the heaviest data-bearers. Scope ambiguity that reshapes the work gets one flag, then the pass continues.

@@ -1,18 +1,5 @@
 # VerifyDeploy Workflow
 
-## Voice Notification
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the VerifyDeploy workflow in the Interceptor skill to verify a deployment"}' \
-  > /dev/null 2>&1 &
-```
-
-Running **VerifyDeploy** in **Interceptor**...
-
----
-
 Confirm a deploy by opening the URL in genuine Chrome and assembling a **four-probe evidence bundle**: DOM read, console errors, network failures, screenshot. Genuine browser sessions carry both public and signed-in pages.
 
 **The bundle is all-or-nothing.** Four probes run on every verification — one body of evidence, not a menu. Pixels alone never close it: no screenshot exposes a hydration mismatch, a quiet JS throw, or a 404 on a lazy chunk. Clean logs alone never close it either — the page must visibly render. Four probes, one bundle, each run. Side benefit: the three non-visual probes ride independent WebSocket types, so a wedged screenshot no longer starves the evidence.

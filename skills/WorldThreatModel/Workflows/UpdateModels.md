@@ -29,15 +29,7 @@ List which windows exist and their last_updated stamps
 Rule: full seeding versus targeted refresh
 ```
 
-### Ping 1: Announce
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Updating world threat models. This will take several minutes as I research current state for each time horizon."}'
-```
-
-### Move 2: Set the Scope
+### Move 1: Set the Scope
 
 **Full seeding** (shelf empty or caller says "rebuild all"):
 - Draft all 11 reads from scratch
@@ -51,7 +43,7 @@ curl -s -X POST http://localhost:31337/notify \
 **Single window** (caller names "the 5-year read"):
 - Research and rewrite that window alone
 
-### Move 3: Gather Fresh Weather
+### Move 2: Gather Fresh Weather
 
 Per read under construction or refresh:
 
@@ -69,7 +61,7 @@ Per read under construction or refresh:
    - Far batch: 15yr, 20yr, 30yr, 50yr (4 workers)
    - Every worker runs Research for its own window
 
-### Move 4: Draft the Reads
+### Move 3: Draft the Reads
 
 Per read, following `ModelTemplate.md`:
 
@@ -81,7 +73,7 @@ Per read, following `ModelTemplate.md`:
 
 Persist to: `DEVOS/MEMORY/RESEARCH/WorldModels/{horizon}.md`
 
-### Move 5: Rebuild the Index
+### Move 4: Rebuild the Index
 
 Write or refresh `DEVOS/MEMORY/RESEARCH/WorldModels/INDEX.md`:
 
@@ -99,14 +91,6 @@ Last full update: {date}
 ## Update History
 
 - YYYY-MM-DD: {what moved and why}
-```
-
-### Ping 6: Close Out
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "World models updated. N horizons refreshed with current research."}'
 ```
 
 ## Worker Brief (for parallel drafting)

@@ -2,19 +2,6 @@
 
 > **One of two paths in the Webdesign skill.** This workflow is **The assistant writes the design directly** with Anthropic's frontend-design philosophy loaded inline. The other path, `CreatePrototype`, drives `claude.ai/design` through Interceptor. See `SKILL.md` for the routing rule.
 
-## Voice Notification
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running DirectDesign in Webdesign", "voice_enabled": true}' > /dev/null 2>&1 &
-```
-
-Then output:
-```
-Running **DirectDesign** in **Webdesign**…
-```
-
 ## When to Choose This Workflow
 
 Choose DirectDesign when:

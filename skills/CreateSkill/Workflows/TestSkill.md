@@ -4,17 +4,6 @@ Prove a skill earns its keep: run it against lifelike prompts and set the result
 
 Drawn from Anthropic's skill-creator practice: the only honest measure of a skill is side-by-side runs on genuine prompts, with and without it.
 
-## Voice Notification
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the TestSkill workflow in the CreateSkill skill to test skill effectiveness"}' \
-  > /dev/null 2>&1 &
-```
-
-Running the **TestSkill** workflow in the **CreateSkill** skill to test skill effectiveness...
-
 ---
 
 ## 1. Frame the skill under test

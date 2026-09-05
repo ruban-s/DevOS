@@ -2,17 +2,6 @@
 
 Run several inference rungs against one prompt on one suite, then recommend a rung with the quality/cost/latency trade-off stated explicitly.
 
-## Voice notification
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the CompareModels workflow in the Evals skill to compare model performance"}' \
-  > /dev/null 2>&1 &
-```
-
-Running the **CompareModels** workflow in the **Evals** skill to compare model performance...
-
 ---
 
 ## Prerequisites

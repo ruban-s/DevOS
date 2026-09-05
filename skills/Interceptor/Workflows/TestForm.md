@@ -1,18 +1,5 @@
 # TestForm Workflow
 
-## Voice Notification
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the TestForm workflow in the Interceptor skill to test a form"}' \
-  > /dev/null 2>&1 &
-```
-
-Running **TestForm** in **Interceptor**...
-
----
-
 Map, fill, post, and prove a form on any page. Semantic element search finds fields by role and name, test data fills them, posting follows, the aftermath gets checked.
 
 ## Suits

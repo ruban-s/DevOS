@@ -2,17 +2,6 @@
 
 A/B (preferably A/B/C) test prompt versions against each other on one suite. **This workflow runs the Science loop for prompt experiments — the pre-commitment section below is mandatory, not decorative.**
 
-## Voice notification
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the ComparePrompts workflow in the Evals skill to A/B test prompts"}' \
-  > /dev/null 2>&1 &
-```
-
-Running the **ComparePrompts** workflow in the **Evals** skill to A/B test prompts...
-
 ---
 
 ## Pre-commitment (BEFORE any run)

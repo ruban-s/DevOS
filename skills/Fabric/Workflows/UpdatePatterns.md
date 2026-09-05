@@ -19,23 +19,14 @@ go install github.com/danielmiessler/fabric@latest
 
 ## Workflow Steps
 
-### Step 1: Announce the Update
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Updating Fabric patterns from upstream repository"}' \
-  > /dev/null 2>&1 &
-```
-
-### Step 2: Record the Starting Count
+### Step 1: Record the Starting Count
 
 ```bash
 CURRENT_COUNT=$(ls -1 DEVOS/skills/Fabric/Patterns/ 2>/dev/null | wc -l | tr -d ' ')
 echo "Current patterns: $CURRENT_COUNT"
 ```
 
-### Step 3: Pull Upstream Through the Fabric CLI
+### Step 2: Pull Upstream Through the Fabric CLI
 
 The fabric CLI knows how to refresh its own pattern store:
 
@@ -45,7 +36,7 @@ fabric -U
 
 Fresh patterns land in `~/.config/fabric/patterns/`.
 
-### Step 4: Mirror Them Into the Skill
+### Step 3: Mirror Them Into the Skill
 
 Copy the refreshed store over this skill's local copy:
 
@@ -53,7 +44,7 @@ Copy the refreshed store over this skill's local copy:
 rsync -av --delete ~/.config/fabric/patterns/ DEVOS/skills/Fabric/Patterns/
 ```
 
-### Step 5: Report the Delta
+### Step 4: Report the Delta
 
 ```bash
 NEW_COUNT=$(ls -1 DEVOS/skills/Fabric/Patterns/ 2>/dev/null | wc -l | tr -d ' ')
@@ -67,7 +58,7 @@ if [ "$NEW_COUNT" -gt "$CURRENT_COUNT" ]; then
 fi
 ```
 
-### Step 6: Confirm the Load-Bearing Patterns Survived
+### Step 5: Confirm the Load-Bearing Patterns Survived
 
 Spot-check the patterns other workflows reach for by name:
 

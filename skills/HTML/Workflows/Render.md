@@ -2,17 +2,6 @@
 
 Convert what this session actually produced into a published, pixel-checked HTML artifact.
 
-## Voice Notification
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the Render workflow in the HTML skill to build a designed HTML artifact"}' \
-  > /dev/null 2>&1 &
-```
-
-Running **Render** in **HTML**...
-
 ## Step 0 — Is There Anything Worth Rendering
 
 When the session hasn't produced anything substantive yet (no analysis run, no research gathered, no artifact drafted), say so and ask what should be rendered — never hallucinate content to fill the page. When several candidate outputs are in play, name the one being rendered (`⚠️ Rendering X, not Y; redirect if wrong.`) and carry on.

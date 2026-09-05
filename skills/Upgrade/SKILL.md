@@ -11,22 +11,6 @@ description: "Improve DevOS from what the best practitioners are shipping around
 
 If this directory exists, load and apply any PREFERENCES.md, configurations, or resources found there. These override default behavior. If the directory does not exist, proceed with skill defaults.
 
-## 🚨 MANDATORY: Voice Notification (REQUIRED BEFORE ANY ACTION)
-
-**You MUST send this notification BEFORE doing anything else when this skill is invoked.**
-
-1. **Send voice notification:**
-   ```bash
-   curl -s -X POST http://localhost:31337/notify \
-     -H "Content-Type: application/json" \
-     -d '{"message": "Running the WORKFLOWNAME workflow in the Upgrade skill to ACTION"}' \
-     > /dev/null 2>&1 &
-   ```
-2. **Output text notification:**
-   ```
-   Running the **WorkflowName** workflow in the **Upgrade** skill to ACTION...
-   ```
-
 # Upgrade
 
 **The ideal state:** the system knows what the best people on the internet are saying, doing, and implementing around AI harnesses — Anthropic most importantly — and its configuration improves from that input. A run is done when every worthwhile new technique from the monitored sources has been extracted (quoted, mapped to a specific DevOS file or component), every candidate has been checked against what the system already has or already decided, and the result reaches the user as tiered, evidence-backed recommendations they can act on immediately.
@@ -42,13 +26,6 @@ Signal comes from two directions, and a good run uses both: **external** (what A
 | **AlgorithmUpgrade** | "algorithm upgrade", "upgrade algorithm", "improve the algorithm", "algorithm improvements", "fix the algorithm" | `Workflows/AlgorithmUpgrade.md` |
 | **ResearchUpgrade** | "research this upgrade", "deep dive on [feature]", "further research" | `Workflows/ResearchUpgrade.md` |
 | **FindSources** | "find upgrade sources", "find new sources", "discover channels" | `Workflows/FindSources.md` |
-
-<!-- public issue #1750, @xmasyx — the TwitterBookmarks routing row was removed
-     here. Workflows/TwitterBookmarks.md is release-excluded (it depends on the
-     private _X skill), so on a public install the row advertised a route to a
-     file that does not ship. The workflow file itself is untouched and can
-     still be run directly; bookmark sweeps route through _X PullBookmarks
-     (`/tb`) and the BookmarkSweep launchd service. -->
 
 **Default workflow:** a bare "upgrade" or "check for upgrades" runs **Upgrade** (which includes reflection mining).
 

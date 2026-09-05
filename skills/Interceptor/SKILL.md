@@ -11,21 +11,6 @@ version: 4.3.19
 
 When that folder exists, read any PREFERENCES.md or config files inside and let them take precedence over the defaults below. When it is absent, continue with the built-in behavior.
 
-## Voice Notification (first action on invocation)
-
-1. **Spoken notice**:
-   ```bash
-   curl -s -X POST http://localhost:31337/notify \
-     -H "Content-Type: application/json" \
-     -d '{"message": "Running the WORKFLOWNAME workflow in the Interceptor skill to ACTION"}' \
-     > /dev/null 2>&1 &
-   ```
-
-2. **Printed notice**:
-   ```
-   Running the **WorkflowName** workflow in the **Interceptor** skill to ACTION...
-   ```
-
 # Interceptor — genuine-browser driving + macOS Computer Use
 
 > **Standing order, outranking everything else:** the moment you're about to ask the operator to touch a browser — open a link, click, fill a field, sign in, paste a value, clear an OAuth screen — treat that impulse as the signal to drive it yourself with Interceptor. The only carve-out is a step that demands a secret you genuinely lack (an unknown password, a hardware 2FA tap); even then, carry the flow all the way to that gate and hand over only the single human-only move. Narrating clickwork for a human to perform is the exact failure this skill exists to eliminate.

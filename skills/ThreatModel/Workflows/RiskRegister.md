@@ -2,15 +2,6 @@
 
 Drive the durable risk ledger — record, browse, rescore, review, retire — through the deterministic CLI.
 
-## Announce
-
-```bash
-curl -s -X POST http://localhost:31337/notify -H "Content-Type: application/json" \
-  -d '{"message": "Running RiskRegister in ThreatModel"}' > /dev/null 2>&1 &
-```
-
-Running **RiskRegister** in **ThreatModel**...
-
 ## The Instrument
 
 The ledger is a deterministic CLI (no model judgment in the storage path). Stock data folder is `DEVOS/PROFILE/SECURITY/THREATMODEL/`; `THREATMODEL_DATA_DIR` overrides.

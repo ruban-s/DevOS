@@ -2,17 +2,6 @@
 
 **Job:** reshape an existing skill into canonical form with correct naming.
 
-## Voice Notification
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the CanonicalizeSkill workflow in the CreateSkill skill to restructure skill"}' \
-  > /dev/null 2>&1 &
-```
-
-Running the **CanonicalizeSkill** workflow in the **CreateSkill** skill to restructure skill...
-
 ---
 
 ## 1. Open the canon

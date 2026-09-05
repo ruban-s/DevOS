@@ -2,23 +2,12 @@
 
 Raise a new skill in canonical shape with TitleCase naming throughout.
 
-## Voice Notification
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the CreateSkill workflow in the CreateSkill skill to create new skill"}' \
-  > /dev/null 2>&1 &
-```
-
-Running the **CreateSkill** workflow in the **CreateSkill** skill to create new skill...
-
 ## Phase 1: Study the canon first
 
 **Non-skippable opening moves:**
 
 1. Read the skill system doctrine: `DEVOS/RUNTIME/DOCS/Skills/SkillSystem.md`
-2. Open one healthy public skill under `DEVOS/skills/` (e.g. `Research/SKILL.md`, `Daemon/SKILL.md`) and note how its frontmatter, voice notice, routing table, and walkthroughs fit together.
+2. Open one healthy public skill under `DEVOS/skills/` (e.g. `Research/SKILL.md`, `Daemon/SKILL.md`) and note how its frontmatter, routing table, and walkthroughs fit together.
 
 ## Phase 2: Pin down the ask
 
@@ -96,25 +85,6 @@ description: [What it does]. USE WHEN [intent triggers using OR]. NOT FOR [confu
 # SkillName
 
 [Brief description]
-
-## Voice Notification
-
-**When executing a workflow, do BOTH:**
-
-1. **Send voice notification**:
-   ```bash
-   curl -s -X POST http://localhost:31337/notify \
-     -H "Content-Type: application/json" \
-     -d '{"message": "Running WORKFLOWNAME in SKILLNAME"}' \
-     > /dev/null 2>&1 &
-   ```
-
-2. **Output text notification**:
-   ```
-   Running **WorkflowName** in **SkillName**...
-   ```
-
-**Full documentation:** `DEVOS/RUNTIME/DOCS/Notifications/NotificationSystem.md`
 
 ## Workflow Routing
 
@@ -283,7 +253,6 @@ Everything TitleCase:
 - [ ] Under 1024 characters
 
 ### Markdown body
-- [ ] `## Voice Notification` present (skills with workflows)
 - [ ] `## Workflow Routing` table present
 - [ ] Every workflow file routed
 - [ ] `## Gotchas` present with known failure modes

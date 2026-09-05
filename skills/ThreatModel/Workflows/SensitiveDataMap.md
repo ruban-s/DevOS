@@ -2,15 +2,6 @@
 
 Chart which estate assets carry sensitive material. Output lands in the private data folder.
 
-## Announce
-
-```bash
-curl -s -X POST http://localhost:31337/notify -H "Content-Type: application/json" \
-  -d '{"message": "Running SensitiveDataMap in ThreatModel"}' > /dev/null 2>&1 &
-```
-
-Running **SensitiveDataMap** in **ThreatModel**...
-
 ## Gate Zero — scope
 
 When the boundary is fuzzy (whole estate versus one app versus one provider) and the choice reshapes the answer, raise one ambiguity flag and continue on "whole estate through the inventory graph." `proceed` accepts.

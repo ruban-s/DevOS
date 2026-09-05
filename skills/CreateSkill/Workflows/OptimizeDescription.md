@@ -4,17 +4,6 @@ Tune a skill's YAML description so it fires when wanted and stays quiet otherwis
 
 The `description:` line in SKILL.md frontmatter is the main firing control. A superb skill that never loads is dead weight. This pass measures and lifts firing accuracy methodically.
 
-## Voice Notification
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the OptimizeDescription workflow in the CreateSkill skill to optimize skill triggering"}' \
-  > /dev/null 2>&1 &
-```
-
-Running the **OptimizeDescription** workflow in the **CreateSkill** skill to optimize skill triggering...
-
 ---
 
 ## 1. Read the live skill

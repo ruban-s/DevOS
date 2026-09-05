@@ -2,17 +2,6 @@
 
 **Job:** extend or adjust a live skill — new workflows, retuned triggers, doc refreshes — without breaking canonical shape or TitleCase.
 
-## Voice Notification
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the UpdateSkill workflow in the CreateSkill skill to modify existing skill"}' \
-  > /dev/null 2>&1 &
-```
-
-Running the **UpdateSkill** workflow in the **CreateSkill** skill to modify existing skill...
-
 ---
 
 ## 1. Open the canon

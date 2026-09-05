@@ -15,23 +15,6 @@ A read-only look backward that answers a forward question: given what you actual
 
 When PREFERENCES.md exists there (default window, store locations, review spot), honor it. Otherwise use the defaults below.
 
-## Voice Notification
-
-**On every run, do BOTH:**
-
-1. **Spoken ping**:
-   ```bash
-   curl -s -X POST http://localhost:31337/notify \
-     -H "Content-Type: application/json" \
-     -d '{"message": "Running WORKFLOWNAME in SuggestSkills"}' \
-     > /dev/null 2>&1 &
-   ```
-
-2. **Printed line**:
-   ```
-   Running **WorkflowName** in **SuggestSkills**...
-   ```
-
 ## The One Path
 
 | Path | Fits when | Doc |

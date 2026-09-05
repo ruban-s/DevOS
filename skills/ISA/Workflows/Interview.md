@@ -20,20 +20,11 @@ A spec interview: adaptive questions that deepen an ISA's prose sections when th
 
 ## Procedure
 
-### 1 — Voice notification
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the Interview workflow in the ISA skill"}' \
-  > /dev/null 2>&1 &
-```
-
-### 2 — Read the ISA
+### 1 — Read the ISA
 
 Load `isa_path`. Mark each section populated, thin, or missing.
 
-### 3 — Queue questions for thin sections only
+### 2 — Queue questions for thin sections only
 
 Walk in priority order. A populated section gets zero questions.
 
@@ -49,17 +40,17 @@ Walk in priority order. A populated section gets zero questions.
 | **Test Strategy** | "How would you actually verify this claim — which command, tool, or probe?" |
 | **Features** | "How does this split into units?" / "What runs parallel, what blocks the path?" |
 
-### 4 — One question per turn
+### 3 — One question per turn
 
 Plain conversation, no form formatting, no "Question N of M". Foundational questions first. Each answer goes straight into the ISA via Edit — prior content preserved, appended or replaced as fits — so the principal watches the document fill.
 
 Borrow the principal's own earlier words when framing later questions. When time is short, drop to the substantial core (Problem, Goal, Claims, Test Strategy) and flag the rest as fill-in-later.
 
-### 5 — Stop conditions
+### 4 — Stop conditions
 
 End on any: every section the substance calls for is populated past thin; `max_questions` reached; explicit done ("that's enough" / "skip the rest"); two consecutive contentless answers ("I don't know" / "skip").
 
-### 6 — Closing pass
+### 5 — Closing pass
 
 Run `Workflows/CheckCompleteness.md`. Surface remaining gaps without blocking — iteration stays open.
 

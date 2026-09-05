@@ -2,17 +2,6 @@
 
 **Job:** measure an existing skill against canonical shape and TitleCase naming.
 
-## Voice Notification
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the ValidateSkill workflow in the CreateSkill skill to validate skill structure"}' \
-  > /dev/null 2>&1 &
-```
-
-Running the **ValidateSkill** workflow in the **CreateSkill** skill to validate skill structure...
-
 ---
 
 ## 1. Open the canon

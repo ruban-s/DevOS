@@ -2,17 +2,6 @@
 
 Advisory only. Nominates; never constructs (construction belongs to CreateSkill once you approve).
 
-## Announce
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running Scan in SuggestSkills"}' \
-  > /dev/null 2>&1 &
-```
-
-Running **Scan** in **SuggestSkills**...
-
 ## Gate Zero — is there enough to judge?
 
 The bundle is the context. When the tool says the ratings store is absent, the friction channel is dark for this pass — state that in the report instead of dressing a topic-only read as whole. When the caller scoped a domain ("anything missing around deploys?"), group inside that scope and say so.

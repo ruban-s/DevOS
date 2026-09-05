@@ -7,15 +7,6 @@ disable-model-invocation: true
 
 # Migrate — external-content intake and classification
 
-## 🚨 MANDATORY: Voice Notification
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Starting the migration. Scanning source and classifying chunks."}' \
-  > /dev/null 2>&1 &
-```
-
 ## The Job
 
 Migrate absorbs outside material — old notes, rule files, vault exports — sorts every chunk against the DevOS taxonomy, and files it at the right destination with its provenance attached. Classification confidence steers the flow: confident chunks auto-approve, middling ones ask for a nod, weak ones get walked through line by line. Two v2 tools back the procedure: MigrateScan (classify into a routing table) and MigrateApprove (commit per the chosen path); the workflow prose below stays intact while their execution legs remain deferred.

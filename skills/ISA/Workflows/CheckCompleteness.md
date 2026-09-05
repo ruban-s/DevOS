@@ -56,20 +56,11 @@ isc_quality:
 
 ## Procedure
 
-### 1 — Voice notification
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the CheckCompleteness workflow in the ISA skill"}' \
-  > /dev/null 2>&1 &
-```
-
-### 2 — Read the ISA
+### 1 — Read the ISA
 
 Load `isa_path`. Parse frontmatter and section headers.
 
-### 3 — Set the bar
+### 2 — Set the bar
 
 | Substance | Owes |
 |---|---|
@@ -79,7 +70,7 @@ Load `isa_path`. Parse frontmatter and section headers.
 
 Project ISA (`<project>/ISA.md`) — always scored substantial or above, whatever the current task's size.
 
-### 4 — Classify each owed section
+### 3 — Classify each owed section
 
 | Verdict | Test |
 |---|---|
@@ -87,7 +78,7 @@ Project ISA (`<project>/ISA.md`) — always scored substantial or above, whateve
 | `missing` | Header absent |
 | `empty` | Header present, body whitespace — acceptable only for `Verification`/`Log` before claims start closing |
 
-### 5 — Audit claim quality
+### 4 — Audit claim quality
 
 Walk every claim in `## Claims` (legacy `## Criteria` also parses; `ISC-N` and short `C1`/`A3` IDs both count; a dedicated `## Anti-claims` section counts toward the anti-claim check):
 
@@ -102,14 +93,14 @@ Walk every claim in `## Claims` (legacy `## Criteria` also parses; `ISC-N` and s
 - **Evidence collapsed on close** — every closed (`[x]`) claim's Verification entry is a one-line stub (commit hash, test name, probe ref). A retained multi-line evidence paragraph is a soft fail — collapse it.
 - **Anchoring** — with frontmatter `principal_stated_goal:` set, every claim needs an `anchors_to` value in Test Strategy (`literal` or `derived: <sub-claim>`). Orphans fail hard.
 
-### 5a — Goal-signal consistency (only on ISAs carrying the key)
+### 4a — Goal-signal consistency (only on ISAs carrying the key)
 
 This check fires ONLY when frontmatter explicitly contains `principal_stated_goal` (any value, including `null`). Older ISAs without the key predate the mechanism and are exempt — presence of the key is the marker.
 
 - Recorded detector signal set but literal empty/null → hard fail: detection fired, preservation didn't.
 - Literal set but under 6 tokens or proposition-free → hard fail: should have been `null` per the minimum-content rule.
 
-### 5b — Artifact presence (deepest grade, keyed ISAs only)
+### 4b — Artifact presence (deepest grade, keyed ISAs only)
 
 Same marker rule as 5a. For every `[x]` claim asserting a named design surface ("the proposal includes X", "a table appears"), scan the ISA body for that surface textually: asserted-complete but textually absent → hard fail. The artifact holds its own design surface; it never references ephemeral chat context.
 
@@ -117,7 +108,7 @@ Same marker rule as 5a. For every `[x]` claim asserting a named design surface (
 
 Retired ceremony keys (density/divergence/acknowledgment families, `effort:` / `effort_source:` / `mode:`) still sit on archived ISAs. Presence is never a failure, values never validated, and new ISAs never write them. The only ambiguity keys graded on current ISAs are `context_sufficient` and `interview_invoked`. Don't invert deleted checks.
 
-### 6 — Compose the report, 7 — gate the close
+### 5 — Compose the report, 6 — gate the close
 
 Emit the YAML above. `status: pass` only with zero hard gaps; `strict: false` softens hard to warnings (mid-interview use). Pre-close, hard gaps block `phase: complete` until filled.
 

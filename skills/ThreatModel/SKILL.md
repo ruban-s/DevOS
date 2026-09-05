@@ -24,23 +24,6 @@ When present, honor `PREFERENCES.md` inside (data spots, which data classes matt
 - `Tools/RiskRegister.ts` structurally rejects any data folder resolving inside a `skills/` path.
 - Ledger rows name credentials by env-var NAME alone — never values. Tokens, keys, and cookies have no place in threat-model output.
 
-## Voice Notification
-
-**On every run, do BOTH:**
-
-1. **Spoken ping**:
-   ```bash
-   curl -s -X POST http://localhost:31337/notify \
-     -H "Content-Type: application/json" \
-     -d '{"message": "Running WORKFLOWNAME in ThreatModel"}' \
-     > /dev/null 2>&1 &
-   ```
-
-2. **Printed line**:
-   ```
-   Running **WorkflowName** in **ThreatModel**...
-   ```
-
 ## Pick Your Path
 
 | Path | Fits when | Doc |

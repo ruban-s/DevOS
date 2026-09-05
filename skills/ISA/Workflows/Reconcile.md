@@ -35,20 +35,11 @@ errors:
 
 ## Procedure
 
-### 1 — Voice notification
-
-```bash
-curl -s -X POST http://localhost:31337/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Running the Reconcile workflow in the ISA skill"}' \
-  > /dev/null 2>&1 &
-```
-
-### 2 — Read both files
+### 1 — Read both files
 
 Load slice and master. Confirm the slice carries the canonical header marker (`<!-- EPHEMERAL FEATURE FILE — derived from ... -->`); anything else aborts — only Scaffold's slice mode produces mergeable input.
 
-### 3 — Plan the claim merge
+### 2 — Plan the claim merge
 
 Per claim in the slice:
 
@@ -58,29 +49,29 @@ Per claim in the slice:
 - ID in slice, absent in master → ERROR, ID-stability violation
 - Renumbered sequence, shifted tombstone → ERROR, ID-stability violation
 
-### 4 — Stage Verification entries
+### 3 — Stage Verification entries
 
 Every staged flip needs the slice's `## Verification` entry for that claim. Stage them for master's `## Verification`. Each must be a **one-line provenance stub** — commit hash, test name, or probe ref. A full evidence paragraph in the slice collapses to the stub before staging; proof lives in git and CI, not in master.
 
-### 5 — Stage Decisions entries
+### 4 — Stage Decisions entries
 
 Append the slice's `## Decisions` to master's, prefixed `[from <feature>]:` with timestamps preserved.
 
-### 6 — Stage Learning entries
+### 5 — Stage Learning entries
 
 New four-piece entries (conjectured / refuted-by / learned / criterion-now) append to master's `## Learning` with a `[surfaced in <feature>]:` note. No changelog section exists to merge — git is the change record.
 
-### 7 — Refresh master frontmatter
+### 6 — Refresh master frontmatter
 
 - `progress: M/N` recomputed from the new `[x]` count
 - `updated:` set to now
 - `phase:` untouched — unless every claim is `[x]`, then `verify` (the close transition belongs to the principal, not to Reconcile)
 
-### 8 — Apply or dry-run
+### 7 — Apply or dry-run
 
 `dry_run: true` → emit the YAML, stop. Otherwise apply via Edit/Write in order: frontmatter → `## Claims` checkmarks → `## Verification` append → `## Decisions` append → `## Learning` append.
 
-### 9 — Archive the slice, 10 — report
+### 8 — Archive the slice, 9 — report
 
 Move the slice to `<slice-dir>/.archive/<feature>-<YYYY-MM-DD>.md` (permanent — forensics, never deleted). Emit the YAML report.
 
