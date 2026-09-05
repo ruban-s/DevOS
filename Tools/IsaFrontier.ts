@@ -12,8 +12,7 @@
  *   bun Tools/IsaFrontier.ts validate <isa>
  */
 
-import { existsSync, mkdirSync, writeFileSync, unlinkSync, readFileSync, realpathSync } from "node:fs";
-import { openSync, closeSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync, unlinkSync, realpathSync, openSync, closeSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { readIsa, frontier, validateEdges, readLocks, lockIsFresh, sha1, findDevosRoot } from "./isa";
 import { parseArgs, emit } from "./lib";
@@ -97,11 +96,14 @@ function main(): void {
     mkdirSync(lockDir, { recursive: true });
     const lockFile = join(lockDir, `${id}.lock`);
     try {
-      const fd = openSync(lockFile, claim && lock && lock.session === session ? "w" : "wx");
+      // Reaching here means the lock is absent, stale, or ours — all overwritable.
+      // "wx" only when absent, so EEXIST still catches a genuine race.
+      const fd = openSync(lockFile, lock ? "w" : "wx");
       writeFileSync(fd, JSON.stringify({ session, ts: new Date().toISOString() }));
       closeSync(fd);
-    } catch {
-      emit({ ok: false, taken: false, reason: `held (race)` }, 2);
+    } catch (e) {
+      const raced = !lock && (e as NodeJS.ErrnoException).code === "EEXIST";
+      emit({ ok: false, taken: false, reason: raced ? "held (race)" : `cannot write lock: ${String(e)}` }, 2);
     }
     emit({ ok: true, taken: true, id, session }, 0);
   }

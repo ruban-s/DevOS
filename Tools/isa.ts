@@ -7,7 +7,7 @@
  */
 
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
-import { join, dirname, basename, resolve } from "node:path";
+import { join, dirname, resolve } from "node:path";
 import { createHash } from "node:crypto";
 
 export interface Claim {
@@ -33,7 +33,8 @@ export interface IsaDoc {
   claims: Claim[];
   fogLines: number;
   tsRows: TsRow[];
-  tsHasAnchorsCol: boolean;
+  /** Column index of anchors_to in the Test Strategy header; -1 when the column is absent. */
+  tsAnchorsCol: number;
 }
 
 const ID_RE = /^([A-Z][A-Z0-9]*-\d[\d.]*|[A-Z]\d+)\s*[:\-–—]\s*(.*)$/;
@@ -74,7 +75,7 @@ export function readIsa(path: string): IsaDoc {
   let fogLines = 0;
   let section = "";
   let inTsTable = false;
-  let tsHasAnchorsCol = false;
+  let tsAnchorsCol = -1;
 
   for (let i = bodyStart; i < lines.length; i++) {
     const line = lines[i];
@@ -91,8 +92,9 @@ export function readIsa(path: string): IsaDoc {
       if (t.startsWith("|")) {
         const cells = t.split("|").slice(1, -1).map((c) => c.trim());
         if (cells.every((c) => /^:?-+:?$/.test(c) || c === "")) continue; // separator
-        if (/^isc$/i.test(cells[0] ?? "")) {
-          tsHasAnchorsCol = cells.some((c) => /^anchors_to$/i.test(c));
+        // "claim" is the header the shipped template + ISA_FORMAT emit; "isc" is the older spelling.
+        if (/^(isc|claim)$/i.test(cells[0] ?? "")) {
+          tsAnchorsCol = cells.findIndex((c) => /^anchors_to$/i.test(c));
           inTsTable = true;
           continue;
         }
@@ -135,7 +137,7 @@ export function readIsa(path: string): IsaDoc {
     claims,
     fogLines,
     tsRows,
-    tsHasAnchorsCol,
+    tsAnchorsCol,
   };
 }
 
@@ -156,7 +158,8 @@ export function gateReport(path: string): GateReport {
     hard.push({ code: "FOG_AT_COMPLETE", message: `${isa.fogLines} unresolved fog line(s) in ## Not yet specified — graduate or kill via Decisions` });
   }
   if (isa.statedGoal !== null) {
-    const unanchored = open.filter((c) => !isa.tsRows.some((r) => r.isc === c.id && r.cells.length > 5 && r.cells[5] !== ""));
+    const ac = isa.tsAnchorsCol;
+    const unanchored = open.filter((c) => !isa.tsRows.some((r) => r.isc === c.id && ac >= 0 && (r.cells[ac] ?? "") !== ""));
     if (unanchored.length > 0) {
       hard.push({ code: "ANCHORS_MISSING", message: `${unanchored.length} claim(s) without anchors_to: ${unanchored.map((c) => c.id).join(", ")}` });
     }
@@ -205,11 +208,10 @@ export type LockMap = Record<string, { session: string; ts: string }>;
 
 export function readLocks(lockDir: string): LockMap {
   const out: LockMap = {};
-  const { existsSync: ex, readdirSync: rd, readFileSync: rf } = { existsSync, readdirSync, readFileSync };
-  if (!ex(lockDir)) return out;
-  for (const f of rd(lockDir)) {
+  if (!existsSync(lockDir)) return out;
+  for (const f of readdirSync(lockDir)) {
     if (!f.endsWith(".lock")) continue;
-    try { out[f.slice(0, -5)] = JSON.parse(rf(join(lockDir, f), "utf-8")); } catch { /* ignore corrupt locks */ }
+    try { out[f.slice(0, -5)] = JSON.parse(readFileSync(join(lockDir, f), "utf-8")); } catch { /* ignore corrupt locks */ }
   }
   return out;
 }
@@ -249,10 +251,6 @@ export function findDevosRoot(start: string): string | null {
   let dir = resolve(start);
   for (;;) {
     if (existsSync(join(dir, "DEVOS", "SKILL.md"))) return dir;
-    // The checkout itself carries DEVOS content at root during development.
-    if (existsSync(join(dir, "SKILL.md")) && existsSync(join(dir, "RUNTIME", "VERSION")) && basename(dir) !== "DEVOS") {
-      // Ambiguous with a target repo that vendored the files — prefer DEVOS/ above.
-    }
     const parent = dirname(dir);
     if (parent === dir) return null;
     dir = parent;
